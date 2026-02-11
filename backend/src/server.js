@@ -4,6 +4,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const path = require('path'); 
 const shopRoutes = require('./routes/shopRoutes');
+const priceRoutes = require('./routes/priceRoutes');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
@@ -16,6 +17,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use('/api/shops', shopRoutes);
+app.use('/api/prices', priceRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running...');

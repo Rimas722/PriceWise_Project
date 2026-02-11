@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import React from 'react';
 
 const ShopCard = ({ shop }) => {
@@ -10,7 +11,9 @@ const ShopCard = ({ shop }) => {
         <h3 style={styles.title}>{shop.shopName}</h3>
         <p style={styles.text}>📍 {shop.address}</p>
         <p style={styles.text}>📞 {shop.phoneNumber}</p>
-        <button style={styles.button}>View Prices</button>
+        <Link to="/prices" style={{...styles.button, display:'block', textAlign:'center', textDecoration:'none'}}>
+            View Prices
+        </Link>
       </div>
     </div>
   );
