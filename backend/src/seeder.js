@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const path = require('path');
+const bcrypt = require('bcryptjs');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
@@ -20,23 +21,26 @@ const importData = async () => {
 
     console.log('🧹 Data Destroyed (Clean Slate)...');
 
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash('password123', salt);
+
     const users = await User.insertMany([
       {
         name: 'Admin User',
         email: 'admin@pricewise.com',
-        password: 'password123', 
+        password: hashedPassword, 
         role: 'admin',
       },
       {
         name: 'Shop Owner 1',
         email: 'shop1@pricewise.com',
-        password: 'password123',
+        password: hashedPassword,
         role: 'shop_owner',
       },
       {
         name: 'Consumer User',
         email: 'user@pricewise.com',
-        password: 'password123',
+        password: hashedPassword,
         role: 'consumer',
       },
     ]);

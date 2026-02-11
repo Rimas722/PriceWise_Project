@@ -1,7 +1,16 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
+  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
+  const handleLogout = () => {
+    localStorage.removeItem('userInfo'); 
+    navigate('/login'); 
+  };
+
   return (
     <nav style={styles.nav}>
       <div style={styles.logo}>
@@ -9,7 +18,15 @@ const Navbar = () => {
       </div>
       <div style={styles.menu}>
         <Link to="/" style={styles.link}>Home</Link>
-        <Link to="/login" style={styles.link}>Login</Link>
+        
+        {userInfo ? (
+          <>
+            <span style={styles.userText}>👤 {userInfo.name}</span>
+            <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
+          </>
+        ) : (
+          <Link to="/login" style={styles.link}>Login</Link>
+        )}
       </div>
     </nav>
   );
@@ -31,11 +48,24 @@ const styles = {
   menu: {
     display: 'flex',
     gap: '20px',
+    alignItems: 'center',
   },
   link: {
     color: 'white',
     textDecoration: 'none',
     fontSize: '1.1rem',
+  },
+  userText: {
+    color: '#00ffcc',
+    fontWeight: 'bold',
+  },
+  logoutBtn: {
+    backgroundColor: 'red',
+    color: 'white',
+    border: 'none',
+    padding: '5px 10px',
+    borderRadius: '5px',
+    cursor: 'pointer',
   }
 };
 
