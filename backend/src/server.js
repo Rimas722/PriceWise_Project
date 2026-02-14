@@ -6,6 +6,7 @@ const path = require('path');
 const shopRoutes = require('./routes/shopRoutes');
 const priceRoutes = require('./routes/priceRoutes');
 const userRoutes = require('./routes/userRoutes');
+const productRoutes = require('./routes/productRoutes');
 
 dotenv.config({ path: path.join(__dirname, '../.env') });
 
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use('/api/shops', shopRoutes);
 app.use('/api/prices', priceRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/products', productRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running...');

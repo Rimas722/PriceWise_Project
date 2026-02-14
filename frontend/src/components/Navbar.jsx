@@ -16,11 +16,16 @@ const Navbar = () => {
       <div style={styles.logo}>
         <Link to="/" style={styles.link}>🏠 PriceWise</Link>
       </div>
+
       <div style={styles.menu}>
         <Link to="/" style={styles.link}>Home</Link>
-        
+        <Link to="/prices" style={styles.link}>Prices</Link>
+
         {userInfo ? (
           <>
+            <Link to="/add-price" style={styles.addBtn}>+ Add Price</Link>
+            <Link to="/my-listings" style={styles.link}>My Listings</Link>
+            
             <span style={styles.userText}>👤 {userInfo.name}</span>
             <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
           </>
@@ -54,6 +59,16 @@ const styles = {
     color: 'white',
     textDecoration: 'none',
     fontSize: '1.1rem',
+  },
+
+  addBtn: {
+    backgroundColor: '#ffc107', 
+    color: 'black',
+    textDecoration: 'none',
+    padding: '5px 10px',
+    borderRadius: '5px',
+    fontWeight: 'bold',
+    marginRight: '15px',
   },
   userText: {
     color: '#00ffcc',

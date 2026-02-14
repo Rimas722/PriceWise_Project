@@ -9,7 +9,7 @@ const generateToken = (id) => {
 };
 
 const registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body; 
 
   try {
     const userExists = await User.findOne({ email });
@@ -24,6 +24,7 @@ const registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      role: role || 'consumer', 
     });
 
     if (user) {
