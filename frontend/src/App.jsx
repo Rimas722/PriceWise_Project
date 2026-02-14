@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import AddPrice from './pages/AddPrice';
 import MyListings from './pages/MyListings';
+import AddProduct from './pages/AddProduct';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/add-price" element={<AddPrice />} />
         <Route path="/my-listings" element={<MyListings />} />
+        <Route path="/add-product" element={<AddProduct />} />
+        <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </div>
   )

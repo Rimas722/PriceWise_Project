@@ -4,10 +4,10 @@ require('../models/Shop');
 
 const getPrices = async (req, res) => {
   try {
-    const prices = await Price.find()
-      .populate('product', 'name category unit image')
-      .populate('shop', 'shopName address')
-      .sort({ price: 1 }); 
+    const prices = await Price.find({})
+      .populate('product', 'name unit')
+      .populate('shop', 'shopName')
+      .populate('submittedBy', 'name email'); 
 
     res.json(prices);
   } catch (error) {
@@ -54,7 +54,7 @@ const deletePrice = async (req, res) => {
       return res.status(404).json({ message: 'Price not found' });
     }
 
-    if (price.submittedBy.toString() !== req.user._id.toString()) {
+    if (price.submittedBy.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
       return res.status(401).json({ message: 'Not authorized to delete this price' });
     }
 

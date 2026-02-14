@@ -25,7 +25,14 @@ const Navbar = () => {
           <>
             <Link to="/add-price" style={styles.addBtn}>+ Add Price</Link>
             <Link to="/my-listings" style={styles.link}>My Listings</Link>
-            
+
+            {userInfo.role === 'admin' && (
+              <>
+                <Link to="/add-product" style={styles.adminBtn}>+ Add Item</Link>
+                <Link to="/admin" style={styles.adminBtn}>Dashboard</Link>
+              </>
+            )}
+
             <span style={styles.userText}>👤 {userInfo.name}</span>
             <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
           </>
@@ -81,7 +88,17 @@ const styles = {
     padding: '5px 10px',
     borderRadius: '5px',
     cursor: 'pointer',
+  },
+  adminBtn: {
+    backgroundColor: 'purple',
+    color: 'white',
+    textDecoration: 'none',
+    padding: '5px 10px',
+    borderRadius: '5px',
+    fontWeight: 'bold',
+    marginRight: '15px',
   }
+
 };
 
 export default Navbar;
