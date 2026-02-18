@@ -1,60 +1,82 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import ShopCard from '../components/ShopCard';
+import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
-  const [shops, setShops] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const fetchShops = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/shops');
-        setShops(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError('Failed to fetch shops. Is the backend running?');
-        setLoading(false);
-      }
-    };
-
-    fetchShops();
-  }, []);
-
-  if (loading) return <h2 style={{textAlign: 'center', marginTop: '50px'}}>Loading Shops...</h2>;
-  if (error) return <h2 style={{textAlign: 'center', color: 'red', marginTop: '50px'}}>{error}</h2>;
-
   return (
     <div style={styles.container}>
-      <header style={styles.header}>
-        <h1>Find Best Prices in Kandy 🇱🇰</h1>
-        <p>Compare prices for Rice, Vegetables, and Groceries near you.</p>
-      </header>
+      <div style={styles.hero}>
+        <h1 style={styles.title}>Welcome to PriceWise 🇱🇰</h1>
+        <p style={styles.subtitle}>
+          The smartest way to compare grocery prices in Sri Lanka.
+          <br />Find the cheapest Rice, Vegetables, and Essentials in your city.
+        </p>
 
-      <div style={styles.grid}>
-        {shops.map((shop) => (
-          <ShopCard key={shop._id} shop={shop} />
-        ))}
+        <div style={styles.buttonContainer}>
+          <Link to="/prices" style={{ ...styles.btn, ...styles.btnPrimary }}>
+            🛒 I want to Buy (Compare Prices)
+          </Link>
+
+          <Link to="/register" style={{ ...styles.btn, ...styles.btnSecondary }}>
+            🏪 I am a Shop Owner (Join Us)
+          </Link>
+        </div>
+      </div>
+
+      <div style={styles.features}>
+        <div style={styles.card}>
+          <h3>🔍 Live Comparison</h3>
+          <p>Real-time prices from shops in Kandy, Colombo, and beyond.</p>
+        </div>
+        <div style={styles.card}>
+          <h3>📉 Save Money</h3>
+          <p>Find the lowest price for your daily essentials instantly.</p>
+        </div>
+        <div style={styles.card}>
+          <h3>🤝 Community Driven</h3>
+          <p>Shop owners update their own prices directly.</p>
+        </div>
       </div>
     </div>
   );
 };
 
 const styles = {
-  container: {
-    padding: '20px',
-    maxWidth: '1200px',
-    margin: '0 auto',
-  },
-  header: {
+  container: { fontFamily: 'Arial, sans-serif' },
+  hero: {
+    backgroundColor: '#282c34',
+    color: 'white',
+    padding: '80px 20px',
     textAlign: 'center',
-    marginBottom: '40px',
   },
-  grid: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', 
-    gap: '20px',
+  title: { fontSize: '3rem', marginBottom: '10px' },
+  subtitle: { fontSize: '1.2rem', marginBottom: '30px', color: '#ccc' },
+  buttonContainer: { display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap' },
+  btn: {
+    padding: '15px 30px',
+    borderRadius: '30px',
+    textDecoration: 'none',
+    fontSize: '1.1rem',
+    fontWeight: 'bold',
+    transition: '0.3s',
+  },
+  btnPrimary: { backgroundColor: '#00d4ff', color: '#000' },
+  btnSecondary: { backgroundColor: 'transparent', border: '2px solid white', color: 'white' },
+  
+  features: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '30px',
+    padding: '50px 20px',
+    flexWrap: 'wrap',
+    backgroundColor: '#f9f9f9',
+  },
+  card: {
+    backgroundColor: 'white',
+    padding: '20px',
+    borderRadius: '10px',
+    boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+    width: '300px',
+    textAlign: 'center',
   }
 };
 

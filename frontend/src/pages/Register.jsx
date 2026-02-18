@@ -28,6 +28,14 @@ const Register = () => {
     } catch (err) {
       setError(err.response?.data?.message || 'Registration Failed');
     }
+
+    localStorage.setItem('userInfo', JSON.stringify(data));
+
+      if (data.role === 'shop_owner') {
+        navigate('/register-shop'); 
+      } else {
+        navigate('/prices'); 
+      }
   };
 
   return (

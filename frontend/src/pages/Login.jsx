@@ -27,7 +27,14 @@ const Login = () => {
       
       console.log("Login Success:", data);
       alert("Login Successful!");
-      navigate('/'); 
+
+      if (data.role === 'admin') {
+        navigate('/admin');            
+      } else if (data.role === 'shop_owner') {
+        navigate('/shop-dashboard');   
+      } else {
+        navigate('/prices');           
+      }
 
     } catch (err) {
       setError('Invalid Email or Password');

@@ -63,4 +63,36 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+const toggleFavorite = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const priceId = req.params.id;
+
+    if (user.favorites.includes(priceId)) {
+      user.favorites = user.favorites.filter(id => id.toString() !== priceId);
+      await user.save();
+      res.json({ message: 'Removed from favorites', favorites: user.favorites });
+    } else {
+      user.favorites.push(priceId);
+      await user.save();
+      res.json({ message: 'Added to favorites', favorites: user.favorites });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+const getFavorites = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).populate({
+      path: 'favorites',
+      populate: { path: 'product shop' } 
+    });
+    
+    res.json(user.favorites);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { registerUser, loginUser, toggleFavorite, getFavorites };

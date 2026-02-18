@@ -3,102 +3,125 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const navigate = useNavigate();
-
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
   const handleLogout = () => {
-    localStorage.removeItem('userInfo'); 
-    navigate('/login'); 
+    localStorage.removeItem('userInfo');
+    navigate('/login');
   };
 
   return (
-    <nav style={styles.nav}>
-      <div style={styles.logo}>
-        <Link to="/" style={styles.link}>🏠 PriceWise</Link>
-      </div>
+    <nav style={styles.navbar}>
+      <div style={styles.container}>
+        <Link to="/" style={styles.logo}>
+          🏠 PriceWise
+        </Link>
 
-      <div style={styles.menu}>
-        <Link to="/" style={styles.link}>Home</Link>
-        <Link to="/prices" style={styles.link}>Prices</Link>
+        <div style={styles.navLinks}>
+          <Link to="/prices" style={styles.link}>💰 Prices</Link>
+          <Link to="/analytics" style={styles.link}>📊 Trends</Link>
+          <Link to="/support" style={styles.link}>📞 Help</Link>
+        </div>
 
-        {userInfo ? (
-          <>
-            <Link to="/add-price" style={styles.addBtn}>+ Add Price</Link>
-            <Link to="/my-listings" style={styles.link}>My Listings</Link>
+<div style={styles.userSection}>
+          {userInfo ? (
+            <>
+              {userInfo.role === 'admin' && (
+                <Link to="/admin" style={styles.dashboardBtn}>🛡️ Admin Panel</Link>
+              )}
 
-            {userInfo.role === 'admin' && (
-              <>
-                <Link to="/add-product" style={styles.adminBtn}>+ Add Item</Link>
-                <Link to="/admin" style={styles.adminBtn}>Dashboard</Link>
-              </>
-            )}
+              {userInfo.role === 'shop_owner' && (
+                <Link to="/shop-dashboard" style={styles.dashboardBtn}>🏪 Shop Dashboard</Link>
+              )}
 
-            <span style={styles.userText}>👤 {userInfo.name}</span>
-            <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
-          </>
-        ) : (
-          <Link to="/login" style={styles.link}>Login</Link>
-        )}
+              {userInfo.role === 'consumer' && (
+                <Link to="/dashboard" style={styles.dashboardBtn}>👤 Consumer Dashboard</Link>
+              )}
+
+              <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
+            </>
+          ) : (
+            <Link to="/login" style={styles.loginBtn}>Login</Link>
+          )}
+        </div>
       </div>
     </nav>
   );
 };
 
 const styles = {
-  nav: {
+  navbar: {
+    backgroundColor: '#1a1a2e',
+    padding: '15px 0',
+    color: 'white',
+    position: 'sticky',
+    top: 0,
+    zIndex: 1000,
+    boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+  },
+  container: {
+    maxWidth: '1200px',
+    margin: '0 auto',
     display: 'flex',
     justifyContent: 'space-between',
-    padding: '1rem 2rem',
-    backgroundColor: '#333',
-    color: 'white',
     alignItems: 'center',
+    padding: '0 20px'
   },
   logo: {
     fontSize: '1.5rem',
     fontWeight: 'bold',
+    color: '#00d4ff', // Cyan color
+    textDecoration: 'none',
   },
-  menu: {
+  navLinks: {
     display: 'flex',
     gap: '20px',
+  },
+  userSection: {
+    display: 'flex',
     alignItems: 'center',
+    gap: '15px',
   },
   link: {
-    color: 'white',
+    color: '#ccc',
     textDecoration: 'none',
-    fontSize: '1.1rem',
+    fontSize: '1rem',
+    transition: '0.3s',
   },
-
-  addBtn: {
-    backgroundColor: '#ffc107', 
-    color: 'black',
-    textDecoration: 'none',
-    padding: '5px 10px',
+  actionBtn: {
+    backgroundColor: '#f1c40f',
+    color: '#000',
+    padding: '8px 15px',
     borderRadius: '5px',
+    textDecoration: 'none',
     fontWeight: 'bold',
-    marginRight: '15px',
+    fontSize: '0.9rem'
   },
-  userText: {
-    color: '#00ffcc',
+  dashboardBtn: {
+    backgroundColor: '#e94560',
+    color: 'white',
+    padding: '8px 15px',
+    borderRadius: '5px',
+    textDecoration: 'none',
+    fontWeight: 'bold',
+    fontSize: '0.9rem'
+  },
+  loginBtn: {
+    backgroundColor: '#00d4ff',
+    color: '#000',
+    padding: '8px 20px',
+    borderRadius: '20px',
+    textDecoration: 'none',
     fontWeight: 'bold',
   },
   logoutBtn: {
-    backgroundColor: 'red',
-    color: 'white',
-    border: 'none',
+    backgroundColor: 'transparent',
+    border: '1px solid #ccc',
+    color: '#ccc',
     padding: '5px 10px',
     borderRadius: '5px',
     cursor: 'pointer',
-  },
-  adminBtn: {
-    backgroundColor: 'purple',
-    color: 'white',
-    textDecoration: 'none',
-    padding: '5px 10px',
-    borderRadius: '5px',
-    fontWeight: 'bold',
-    marginRight: '15px',
   }
-
 };
 
 export default Navbar;
