@@ -1,124 +1,99 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const UserDashboard = () => {
-  const [activeTab, setActiveTab] = useState('watchlist');
   const [favorites, setFavorites] = useState([]);
-  const [myContributions, setMyContributions] = useState([]);
-
+  const [loading, setLoading] = useState(true);
+  
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-  const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const favRes = await axios.get('http://localhost:5000/api/users/favorites', config);
-        setFavorites(favRes.data);
+    if (!userInfo) {
+      navigate('/login');
+      return;
+    }
 
-        const contribRes = await axios.get('http://localhost:5000/api/prices/my-prices', config);
-        setMyContributions(contribRes.data);
+    const fetchFavorites = async () => {
+      try {
+        const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+        const { data } = await axios.get('http://localhost:5000/api/users/favorites', config);
+        
+        const validFavorites = data.filter(item => item && item.product);
+        setFavorites(validFavorites);
+        setLoading(false);
       } catch (error) {
-        console.error(error);
+        console.error('Error fetching favorites', error);
+        setLoading(false);
       }
     };
-    fetchData();
-  }, []);
 
-  const handleDeleteContribution = async (id) => {
-    if (window.confirm('Delete this price submission?')) {
-      try {
-        await axios.delete(`http://localhost:5000/api/prices/${id}`, config);
-        alert('Price deleted');
-        setMyContributions(myContributions.filter(p => p._id !== id));
-      } catch (error) {
-        alert('Error deleting price');
-      }
+    fetchFavorites();
+  }, [navigate, userInfo]);
+
+  const removeFavorite = async (priceId) => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+      await axios.post('http://localhost:5000/api/users/favorites', { priceId }, config);
+   
+      setFavorites(favorites.filter(item => item._id !== priceId));
+    } catch (error) {
+      alert("Error removing item.");
     }
   };
 
+  if (loading) return <div style={{textAlign: 'center', marginTop: '50px'}}>⏳ Loading your Watchlist...</div>;
+
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'Arial, sans-serif' }}>
-
-      <div style={{ width: '250px', backgroundColor: '#2c3e50', color: 'white', padding: '20px' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '30px' }}>👤 Consumer</h2>
-        <div style={{ marginBottom: '20px', textAlign:'center', fontSize:'0.9rem', color:'#bdc3c7' }}>
-           Hello, {userInfo.name}
-        </div>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <button onClick={() => setActiveTab('watchlist')} style={itemStyle(activeTab === 'watchlist')}>❤️ My Watchlist</button>
-          <button onClick={() => setActiveTab('contributions')} style={itemStyle(activeTab === 'contributions')}>🏆 My Contributions</button>
-        </nav>
-      </div>
-
-      <div style={{ flex: 1, padding: '40px', backgroundColor: '#f4f6f7' }}>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-          <h1>My Dashboard</h1>
-          <Link to="/add-price" style={{ backgroundColor: '#2ecc71', color: 'white', padding: '10px 20px', textDecoration: 'none', borderRadius: '5px', fontWeight: 'bold' }}>
-            + Report New Price
-          </Link>
+    <div style={{ backgroundColor: '#f4f6f7', minHeight: '100vh', padding: '40px 20px', fontFamily: 'Arial, sans-serif' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        
+        <div style={{ backgroundColor: '#2c3e50', color: 'white', padding: '30px', borderRadius: '10px', marginBottom: '30px' }}>
+          <h1 style={{ margin: '0 0 10px 0' }}>👋 Hello, {userInfo.name}</h1>
+          <p style={{ margin: 0, color: '#bdc3c7' }}>Welcome to your Consumer Dashboard.</p>
         </div>
 
-        {activeTab === 'watchlist' && (
-          <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-            <h3>❤️ Saved Items</h3>
-            {favorites.length === 0 ? <p>No favorites yet. Go to Prices and click ❤️.</p> : (
-              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
-                <thead>
-                  <tr style={{ backgroundColor: '#ecf0f1', textAlign: 'left' }}>
-                    <th style={{ padding: '10px' }}>Product</th>
-                    <th style={{ padding: '10px' }}>Shop</th>
-                    <th style={{ padding: '10px' }}>Price</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {favorites.map((item) => (
-                    <tr key={item._id} style={{ borderBottom: '1px solid #eee' }}>
-                      <td style={{ padding: '10px' }}>{item.product?.name}</td>
-                      <td style={{ padding: '10px' }}>{item.shop?.shopName}</td>
-                      <td style={{ padding: '10px', fontWeight: 'bold', color: 'green' }}>Rs. {item.price}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+        <h2 style={{ color: '#2c3e50', borderBottom: '2px solid #3498db', paddingBottom: '10px', display: 'inline-block' }}>
+          ❤️ My Watchlist
+        </h2>
+
+        {favorites.length === 0 ? (
+          <div style={{ backgroundColor: 'white', padding: '40px', textAlign: 'center', borderRadius: '10px', marginTop: '20px' }}>
+            <h3 style={{ color: '#7f8c8d' }}>Your Watchlist is empty.</h3>
+            <Link to="/prices" style={{ display: 'inline-block', marginTop: '15px', backgroundColor: '#3498db', color: 'white', padding: '10px 20px', borderRadius: '5px', textDecoration: 'none' }}>
+              Browse Prices
+            </Link>
           </div>
-        )}
+        ) : (
+          <div style={gridStyle}>
+            {favorites.map((item) => (
+              <div key={item._id} style={cardStyle}>
+                
+                <img 
+                  src={item.product?.image || 'https://placehold.co/300x200?text=No+Image'} 
+                  alt={item.product?.name} 
+                  style={imageStyle} 
+                />
+                
+                <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
+                  <h3 style={{ margin: '0 0 5px 0', color: '#2c3e50' }}>{item.product?.name}</h3>
+                  <div style={{ color: '#7f8c8d', fontSize: '0.9rem', marginBottom: '15px' }}>
+                    🏪 <strong>{item.shop?.shopName}</strong>
+                  </div>
+                  
+                  <div style={{ marginTop: 'auto' }}>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#27ae60' }}>
+                      Rs. {item.price}
+                    </div>
+                  </div>
+                </div>
 
-        {activeTab === 'contributions' && (
-          <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
-            <h3>🏆 Prices You Found</h3>
-            <p style={{fontSize:'0.9rem', color:'#777', marginBottom:'15px'}}>Thanks for helping the community! These are prices you reported.</p>
-            
-            {myContributions.length === 0 ? <p>You haven't reported any prices yet.</p> : (
-              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
-                <thead>
-                  <tr style={{ backgroundColor: '#ecf0f1', textAlign: 'left' }}>
-                    <th style={{ padding: '10px' }}>Product</th>
-                    <th style={{ padding: '10px' }}>Shop</th>
-                    <th style={{ padding: '10px' }}>Price</th>
-                    <th style={{ padding: '10px' }}>Status</th>
-                    <th style={{ padding: '10px' }}>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {myContributions.map((price) => (
-                    <tr key={price._id} style={{ borderBottom: '1px solid #eee' }}>
-                      <td style={{ padding: '10px' }}>{price.product?.name}</td>
-                      <td style={{ padding: '10px' }}>{price.shop?.shopName}</td>
-                      <td style={{ padding: '10px' }}>Rs. {price.price}</td>
-                      <td style={{ padding: '10px' }}>
-                         {price.status === 'approved' ? '✅ Live' : '⏳ Pending'}
-                      </td>
-                      <td style={{ padding: '10px' }}>
-                        <button onClick={() => handleDeleteContribution(price._id)} style={{color:'red', background:'none', border:'none', cursor:'pointer', fontWeight:'bold'}}>Delete</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
+                <button onClick={() => removeFavorite(item._id)} style={removeBtnStyle}>
+                  ❌ Remove
+                </button>
+              </div>
+            ))}
           </div>
         )}
 
@@ -127,16 +102,18 @@ const UserDashboard = () => {
   );
 };
 
-const itemStyle = (active) => ({
-  padding: '15px', 
-  cursor: 'pointer', 
-  background: active ? '#34495e' : 'transparent', 
-  border: 'none', 
-  color: 'white', 
-  textAlign: 'left', 
-  fontSize: '1rem',
-  borderLeft: active ? '5px solid #2ecc71' : '5px solid transparent',
-  width: '100%'
-});
+
+const gridStyle = {
+  display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '20px', marginTop: '20px'
+};
+const cardStyle = {
+  backgroundColor: 'white', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column'
+};
+const imageStyle = {
+  width: '100%', height: '180px', objectFit: 'cover', borderBottom: '1px solid #f1f2f6'
+};
+const removeBtnStyle = {
+  width: '100%', padding: '12px', border: 'none', backgroundColor: '#ffeaa7', color: '#d35400', fontWeight: 'bold', cursor: 'pointer', transition: '0.2s'
+};
 
 export default UserDashboard;

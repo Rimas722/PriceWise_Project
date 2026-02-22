@@ -66,28 +66,36 @@ const loginUser = async (req, res) => {
 const toggleFavorite = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
-    const priceId = req.params.id;
+    const { priceId } = req.body;
 
     if (user.favorites.includes(priceId)) {
       user.favorites = user.favorites.filter(id => id.toString() !== priceId);
       await user.save();
-      res.json({ message: 'Removed from favorites', favorites: user.favorites });
+      res.json({ message: 'Removed from Watchlist' });
     } else {
       user.favorites.push(priceId);
       await user.save();
-      res.json({ message: 'Added to favorites', favorites: user.favorites });
+      res.json({ message: 'Added to Watchlist' });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
+
 const getFavorites = async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate({
       path: 'favorites',
-      populate: { path: 'product shop' } 
+      populate: [
+        { path: 'product', select: 'name image category' },
+        { path: 'shop', select: 'shopName' }
+      ]
     });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
     
     res.json(user.favorites);
   } catch (error) {

@@ -1,19 +1,20 @@
 const Report = require('../models/Report');
 
 const createReport = async (req, res) => {
-  const { priceId, reason } = req.body;
-
   try {
+    const { price, reason } = req.body;
+    
+    const Report = require('../models/Report'); 
     const report = new Report({
-      price: priceId,
-      reportedBy: req.user._id,
+      price,
       reason,
+      reportedBy: req.user._id
     });
 
     const createdReport = await report.save();
     res.status(201).json(createdReport);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
