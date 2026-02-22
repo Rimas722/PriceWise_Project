@@ -15,6 +15,8 @@ import AdminDashboard from './pages/AdminDashboard';
 import Analytics from './pages/Analytics';
 import Support from './pages/Support';
 import AddProduct from './pages/AddProduct'; 
+import About from './pages/About';
+import Contact from './pages/Contact';
 
 const HomeRoute = ({ children }) => {
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -44,6 +46,8 @@ const App = () => {
         <Route path="/shop/:id" element={<ShopProfile />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/support" element={<Support />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
 
         <Route path="/add-price" element={<AddPrice />} />
         <Route path="/dashboard" element={<UserDashboard />} />

@@ -3,81 +3,68 @@ import { Link } from 'react-router-dom';
 
 const Home = () => {
   return (
-    <div style={styles.container}>
-      <div style={styles.hero}>
-        <h1 style={styles.title}>Welcome to PriceWise 🇱🇰</h1>
-        <p style={styles.subtitle}>
-          The smartest way to compare grocery prices in Sri Lanka.
-          <br />Find the cheapest Rice, Vegetables, and Essentials in your city.
+    <div style={{ fontFamily: 'Arial, sans-serif', backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+
+      <div style={{ backgroundColor: '#2c3e50', color: 'white', padding: '80px 20px', textAlign: 'center' }}>
+        <h1 style={{ fontSize: '3.5rem', margin: '0 0 20px 0', color: '#00d4ff' }}>
+          Welcome to PriceWise LK
+        </h1>
+        <p style={{ fontSize: '1.2rem', maxWidth: '600px', margin: '0 auto 40px auto', color: '#bdc3c7' }}>
+          The smartest way to compare grocery prices. Find the cheapest Rice, Vegetables, and Essentials in your city instantly.
         </p>
-
-        <div style={styles.buttonContainer}>
-          <Link to="/prices" style={{ ...styles.btn, ...styles.btnPrimary }}>
-            🛒 I want to Buy (Compare Prices)
+        
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap' }}>
+          <Link to="/prices" style={{ backgroundColor: '#00d4ff', color: '#000', padding: '15px 30px', borderRadius: '30px', textDecoration: 'none', fontWeight: 'bold', fontSize: '1.1rem' }}>
+            🛒 Start Comparing Prices
           </Link>
-
-          <Link to="/register" style={{ ...styles.btn, ...styles.btnSecondary }}>
-            🏪 I am a Shop Owner (Join Us)
+          <Link to="/register-shop" style={{ backgroundColor: 'transparent', color: 'white', border: '2px solid white', padding: '15px 30px', borderRadius: '30px', textDecoration: 'none', fontWeight: 'bold', fontSize: '1.1rem' }}>
+            🏪 I am a Shop Owner
           </Link>
         </div>
       </div>
 
-      <div style={styles.features}>
-        <div style={styles.card}>
-          <h3>🔍 Live Comparison</h3>
-          <p>Real-time prices from shops in Kandy, Colombo, and beyond.</p>
+      <div style={{ backgroundColor: '#f1c40f', padding: '20px', textAlign: 'center', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
+        <h3 style={{ margin: '0 0 10px 0', color: '#2c3e50' }}>Spotted a great deal or a price change in the market?</h3>
+        <p style={{ margin: '0 0 15px 0', color: '#333' }}>Help the community by updating the prices!</p>
+        <Link to="/login" style={{ display: 'inline-block', backgroundColor: '#2c3e50', color: 'white', padding: '10px 25px', borderRadius: '5px', textDecoration: 'none', fontWeight: 'bold' }}>
+          🔐 Please Login to Add a Price
+        </Link>
+      </div>
+
+      <div style={{ maxWidth: '1000px', margin: '60px auto', padding: '0 20px', display: 'flex', gap: '30px', flexWrap: 'wrap', justifyContent: 'center' }}>
+        
+        <div style={featureCardStyle}>
+          <h2 style={{ fontSize: '2rem', margin: '0 0 10px 0' }}>🔍</h2>
+          <h3 style={{ color: '#2c3e50' }}>Live Comparison</h3>
+          <p style={{ color: '#666' }}>Real-time prices from local verified shops, updated daily.</p>
         </div>
-        <div style={styles.card}>
-          <h3>📉 Save Money</h3>
-          <p>Find the lowest price for your daily essentials instantly.</p>
+
+        <div style={featureCardStyle}>
+          <h2 style={{ fontSize: '2rem', margin: '0 0 10px 0' }}>📉</h2>
+          <h3 style={{ color: '#2c3e50' }}>Save Money</h3>
+          <p style={{ color: '#666' }}>Find the lowest price for your daily essentials instantly and cut grocery bills.</p>
         </div>
-        <div style={styles.card}>
-          <h3>🤝 Community Driven</h3>
-          <p>Shop owners update their own prices directly.</p>
+
+        <div style={featureCardStyle}>
+          <h2 style={{ fontSize: '2rem', margin: '0 0 10px 0' }}>🤝</h2>
+          <h3 style={{ color: '#2c3e50' }}>Community Driven</h3>
+          <p style={{ color: '#666' }}>Consumers and shop owners work together to keep prices accurate.</p>
         </div>
+
       </div>
     </div>
   );
 };
 
-const styles = {
-  container: { fontFamily: 'Arial, sans-serif' },
-  hero: {
-    backgroundColor: '#282c34',
-    color: 'white',
-    padding: '80px 20px',
-    textAlign: 'center',
-  },
-  title: { fontSize: '3rem', marginBottom: '10px' },
-  subtitle: { fontSize: '1.2rem', marginBottom: '30px', color: '#ccc' },
-  buttonContainer: { display: 'flex', justifyContent: 'center', gap: '20px', flexWrap: 'wrap' },
-  btn: {
-    padding: '15px 30px',
-    borderRadius: '30px',
-    textDecoration: 'none',
-    fontSize: '1.1rem',
-    fontWeight: 'bold',
-    transition: '0.3s',
-  },
-  btnPrimary: { backgroundColor: '#00d4ff', color: '#000' },
-  btnSecondary: { backgroundColor: 'transparent', border: '2px solid white', color: 'white' },
-  
-  features: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '30px',
-    padding: '50px 20px',
-    flexWrap: 'wrap',
-    backgroundColor: '#f9f9f9',
-  },
-  card: {
-    backgroundColor: 'white',
-    padding: '20px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-    width: '300px',
-    textAlign: 'center',
-  }
+const featureCardStyle = {
+  flex: '1',
+  minWidth: '250px',
+  backgroundColor: 'white',
+  padding: '30px',
+  borderRadius: '10px',
+  textAlign: 'center',
+  boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
+  borderTop: '5px solid #3498db'
 };
 
 export default Home;

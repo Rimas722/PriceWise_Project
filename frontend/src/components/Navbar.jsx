@@ -20,10 +20,11 @@ const Navbar = () => {
         <div style={styles.navLinks}>
           <Link to="/prices" style={styles.link}>💰 Prices</Link>
           <Link to="/analytics" style={styles.link}>📊 Trends</Link>
-          <Link to="/support" style={styles.link}>📞 Help</Link>
+          <Link to="/about" style={styles.link}>ℹ️ About Us</Link>
+          <Link to="/contact" style={styles.link}>✉️ Contact</Link>
         </div>
 
-<div style={styles.userSection}>
+        <div style={styles.userSection}>
           {userInfo ? (
             <>
               {userInfo.role === 'admin' && (
@@ -41,7 +42,10 @@ const Navbar = () => {
               <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
             </>
           ) : (
-            <Link to="/login" style={styles.loginBtn}>Login</Link>
+            <div style={{ display: 'flex', gap: '15px' }}>
+              <Link to="/login" style={styles.loginBtn}>Login</Link>
+              <Link to="/register" style={styles.registerBtn}>Register</Link>
+            </div>
           )}
         </div>
       </div>
@@ -70,7 +74,7 @@ const styles = {
   logo: {
     fontSize: '1.5rem',
     fontWeight: 'bold',
-    color: '#00d4ff', // Cyan color
+    color: '#00d4ff',
     textDecoration: 'none',
   },
   navLinks: {
@@ -88,15 +92,6 @@ const styles = {
     fontSize: '1rem',
     transition: '0.3s',
   },
-  actionBtn: {
-    backgroundColor: '#f1c40f',
-    color: '#000',
-    padding: '8px 15px',
-    borderRadius: '5px',
-    textDecoration: 'none',
-    fontWeight: 'bold',
-    fontSize: '0.9rem'
-  },
   dashboardBtn: {
     backgroundColor: '#e94560',
     color: 'white',
@@ -107,12 +102,24 @@ const styles = {
     fontSize: '0.9rem'
   },
   loginBtn: {
-    backgroundColor: '#00d4ff',
-    color: '#000',
-    padding: '8px 20px',
+    backgroundColor: 'transparent',
+    color: '#00d4ff',
+    border: '2px solid #00d4ff',
+    padding: '6px 20px',
     borderRadius: '20px',
     textDecoration: 'none',
     fontWeight: 'bold',
+    transition: '0.3s'
+  },
+  registerBtn: {
+    backgroundColor: '#00d4ff',
+    color: '#000',
+    border: '2px solid #00d4ff',
+    padding: '6px 20px',
+    borderRadius: '20px',
+    textDecoration: 'none',
+    fontWeight: 'bold',
+    transition: '0.3s'
   },
   logoutBtn: {
     backgroundColor: 'transparent',
