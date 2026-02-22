@@ -1,19 +1,20 @@
-import { Routes, Route, Maps } from 'react-router-dom'
-import Navbar from './components/Navbar' 
-import Home from './pages/Home'
-import PriceComparison from './pages/PriceComparison';
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom'; 
+
+import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AddPrice from './pages/AddPrice';
-import MyListings from './pages/MyListings';
-import AddProduct from './pages/AddProduct';
-import AdminDashboard from './pages/AdminDashboard';
+import PriceComparison from './pages/PriceComparison';
+import Navbar from './components/Navbar';
 import ShopProfile from './pages/ShopProfile';
-import RegisterShop from './pages/RegisterShop';
-import UserDashboard from './pages/UserDashboard';
+import UserDashboard from './pages/UserDashboard'; 
+import ShopOwnerDashboard from './pages/ShopOwnerDashboard'; 
+import RegisterShop from './pages/RegisterShop'; 
+import AdminDashboard from './pages/AdminDashboard';
 import Analytics from './pages/Analytics';
 import Support from './pages/Support';
-import ShopOwnerDashboard from './pages/ShopOwnerDashboard';
+import AddProduct from './pages/AddProduct'; 
 
 const HomeRoute = ({ children }) => {
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -27,29 +28,32 @@ const HomeRoute = ({ children }) => {
   return children; 
 };
 
-function App() {
+const App = () => {
   return (
-    <div>
-      <Navbar /> 
-      
+    <> 
+      <Navbar />
       <Routes>
-        <Route path="/" element={<HomeRoute><Home /></HomeRoute>} />
-        <Route path="/prices" element={<PriceComparison />} />
+        <Route path="/" element={
+          <HomeRoute>
+            <Home />
+          </HomeRoute>
+        } />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/add-price" element={<AddPrice />} />
-        <Route path="/my-listings" element={<MyListings />} />
-        <Route path="/add-product" element={<AddProduct />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/prices" element={<PriceComparison />} />
         <Route path="/shop/:id" element={<ShopProfile />} />
-        <Route path="/register-shop" element={<RegisterShop />} />
-        <Route path="/dashboard" element={<UserDashboard />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/support" element={<Support />} />
-        <Route path="/shop-dashboard" element={<ShopOwnerDashboard />} />
-      </Routes>
-    </div>
-  )
-}
 
-export default App
+        <Route path="/add-price" element={<AddPrice />} />
+        <Route path="/dashboard" element={<UserDashboard />} />
+        <Route path="/shop-dashboard" element={<ShopOwnerDashboard />} />
+        <Route path="/register-shop" element={<RegisterShop />} />
+        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/add-product" element={<AddProduct />} />
+      </Routes>
+    </>
+  );
+};
+
+export default App;

@@ -6,53 +6,50 @@ const RegisterShop = () => {
   const [shopName, setShopName] = useState('');
   const [address, setAddress] = useState('');
   const [phoneNumber, setPhone] = useState('');
+  
   const navigate = useNavigate();
+  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
-  const handleSubmit = async (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
-    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-
-    if (!userInfo) {
-      alert("Please login first");
-      return;
-    }
+    if (!userInfo) return alert("Please login first");
 
     try {
-      const config = {
-        headers: { Authorization: `Bearer ${userInfo.token}` },
-      };
+      const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+      
+      await axios.post('http://localhost:5000/api/shops', {
+        shopName, address, phoneNumber
+      }, config);
 
-      await axios.post(
-        'http://localhost:5000/api/shops',
-        { shopName, address, phoneNumber },
-        config
-      );
-
-      alert('Shop Registered Successfully! Waiting for Admin Approval.');
-      navigate('/'); 
+      alert("Shop Registered! Please wait for Admin Approval.");
+      navigate('/shop-dashboard');
 
     } catch (error) {
-      alert('Error registering shop');
-      console.error(error);
+      alert("Error registering shop. You might already have one!");
     }
   };
 
   return (
-    <div style={{ maxWidth: '500px', margin: '50px auto', padding: '20px', boxShadow: '0 0 10px rgba(0,0,0,0.1)', borderRadius: '8px' }}>
+    <div style={{ maxWidth: '500px', margin: '50px auto', padding: '30px', boxShadow: '0 0 10px rgba(0,0,0,0.1)', borderRadius:'8px' }}>
       <h2 style={{ textAlign: 'center' }}>🏪 Register Your Shop</h2>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-        
-        <label>Shop Name:</label>
-        <input type="text" value={shopName} onChange={(e) => setShopName(e.target.value)} style={{ padding: '10px' }} required placeholder="e.g. Colombo Supermart"/>
+      <p style={{ textAlign: 'center', color: '#666', marginBottom:'20px' }}>Join our platform to reach more customers.</p>
+      
+      <form onSubmit={submitHandler} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        <input 
+          type="text" placeholder="Shop Name" value={shopName} onChange={(e) => setShopName(e.target.value)} 
+          required style={{ padding: '10px' }} 
+        />
+        <input 
+          type="text" placeholder="Address (City, Street)" value={address} onChange={(e) => setAddress(e.target.value)} 
+          required style={{ padding: '10px' }} 
+        />
+        <input 
+          type="text" placeholder="Phone Number" value={phoneNumber} onChange={(e) => setPhone(e.target.value)} 
+          required style={{ padding: '10px' }} 
+        />
 
-        <label>Address:</label>
-        <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} style={{ padding: '10px' }} required placeholder="City, Street"/>
-
-        <label>Phone Number:</label>
-        <input type="text" value={phoneNumber} onChange={(e) => setPhone(e.target.value)} style={{ padding: '10px' }} required placeholder="077..."/>
-
-        <button type="submit" style={{ padding: '10px', backgroundColor: '#28a745', color: 'white', border: 'none', cursor: 'pointer' }}>
-          Submit for Approval
+        <button type="submit" style={{ padding: '12px', backgroundColor: '#2c3e50', color: 'white', border: 'none', cursor: 'pointer', fontWeight:'bold' }}>
+          Submit Application
         </button>
       </form>
     </div>
