@@ -17,6 +17,7 @@ import Support from './pages/Support';
 import AddProduct from './pages/AddProduct'; 
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Footer from './components/Footer';
 
 const HomeRoute = ({ children }) => {
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -56,6 +57,7 @@ const App = () => {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/add-product" element={<AddProduct />} />
       </Routes>
+      <Footer />
     </>
   );
 };
