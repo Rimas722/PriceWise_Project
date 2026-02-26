@@ -91,6 +91,22 @@ const PriceComparison = () => {
 
   if (loading) return <div style={{textAlign: 'center', marginTop: '50px', fontSize: '1.2rem'}}>⏳ Loading latest prices...</div>;
 
+  const handleDeletePrice = async (priceId) => {
+    if (window.confirm("Admin: Are you sure you want to delete this live price?")) {
+      try {
+        const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+        const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+
+        await axios.delete(`http://localhost:5000/api/prices/${priceId}`, config);
+
+        setPrices(prices.filter(p => p._id !== priceId));
+        alert("Price deleted successfully.");
+      } catch (error) {
+        alert("Error deleting price.");
+      }
+    }
+  };
+
   return (
     <div style={{ backgroundColor: '#f4f6f7', minHeight: '100vh', padding: '40px 20px', fontFamily: 'Arial, sans-serif' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
@@ -175,6 +191,14 @@ const PriceComparison = () => {
                   <button onClick={() => handleReport(item._id)} style={{...actionBtnStyle, color: '#e74c3c'}}>
                     🚩 Report
                   </button>
+                  {userInfo?.role === 'admin' && (
+                    <button 
+                      onClick={() => handleDeletePrice(item._id)} 
+                      style={{ background: '#e74c3c', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', marginLeft: '10px' }}
+                    >
+                      🗑️ Delete
+                    </button>
+                  )}
                 </div>
 
               </div>

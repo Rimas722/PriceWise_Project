@@ -16,13 +16,14 @@ const getPrices = async (req, res) => {
 };
 
 const createPrice = async (req, res) => {
-  const { product, shop, price } = req.body;
+  const { product, shop, price, proofImage } = req.body;
 
   try {
     const newPrice = new Price({
       product,
       shop,
       price,
+      proofImage: proofImage || '', 
       submittedBy: req.user._id, 
       status: 'pending' 
     });
@@ -69,15 +70,38 @@ const deletePrice = async (req, res) => {
 
 const approvePrice = async (req, res) => {
   try {
-    const price = await Price.findById(req.params.id);
-    if (price) {
-      price.status = 'approved';
-      const updatedPrice = await price.save();
-      res.json(updatedPrice);
+    const pendingPrice = await Price.findById(req.params.id);
+
+    if (!pendingPrice) {
+      return res.status(404).json({ message: 'Pending price not found' });
+    }
+
+    const existingPrice = await Price.findOne({
+      product: pendingPrice.product,
+      shop: pendingPrice.shop,
+      status: 'approved'
+    });
+
+    if (existingPrice) {
+      existingPrice.price = pendingPrice.price;
+
+      if (pendingPrice.proofImage) {
+        existingPrice.proofImage = pendingPrice.proofImage; 
+      }
+
+      await existingPrice.save();
+
+      await pendingPrice.deleteOne(); 
+
+      res.json({ message: 'Existing price updated successfully!', price: existingPrice });
     } else {
-      res.status(404).json({ message: 'Price not found' });
+      pendingPrice.status = 'approved';
+      await pendingPrice.save();
+
+      res.json({ message: 'New price approved successfully!', price: pendingPrice });
     }
   } catch (error) {
+    console.error("🚨 Error approving price:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -85,8 +109,8 @@ const approvePrice = async (req, res) => {
 const getAllPricesAdmin = async (req, res) => {
   try {
     const prices = await Price.find({}) 
-      .populate('product', 'name unit category image ')
-      .populate('shop', 'shopName')
+      .populate('product', 'name image category')
+      .populate('shop', 'shopName address')
       .populate('submittedBy', 'name email');
     res.json(prices);
   } catch (error) {

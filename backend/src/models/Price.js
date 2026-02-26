@@ -21,8 +21,11 @@ const priceSchema = mongoose.Schema({
     required: true,
   },
   proofImage: {
-    type: String, 
+    type: String, default: ""
   },
+  submittedBy: {
+     type: mongoose.Schema.Types.ObjectId, ref: 'User' 
+    },
   status: {
     type: String,
     enum: ['pending', 'approved', 'rejected'], 

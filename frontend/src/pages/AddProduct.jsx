@@ -55,7 +55,7 @@ const AddProduct = () => {
       );
 
       alert('Product Added Successfully!');
-      navigate('/'); 
+      navigate('/admin/products'); 
 
     } catch (error) {
       alert('Error adding product');

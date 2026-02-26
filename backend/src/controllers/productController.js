@@ -22,17 +22,14 @@ const createProduct = async (req, res) => {
   }
 };
 
-const updateProduct = async (req, res) => {
-  const { name, category, unit, image } = req.body;
-
+  const updateProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
 
     if (product) {
-      product.name = name || product.name;
-      product.category = category || product.category;
-      product.unit = unit || product.unit;
-      product.image = image || product.image; 
+      product.name = req.body.name || product.name;
+      product.image = req.body.image || product.image;
+      product.category = req.body.category || product.category; 
 
       const updatedProduct = await product.save();
       res.json(updatedProduct);
@@ -40,7 +37,8 @@ const updateProduct = async (req, res) => {
       res.status(404).json({ message: 'Product not found' });
     }
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error("🚨 CRASH REASON:", error);
+    res.status(500).json({ message: error.message });
   }
 };
 

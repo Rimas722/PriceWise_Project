@@ -20,8 +20,12 @@ const Navbar = () => {
         <div style={styles.navLinks}>
           <Link to="/prices" style={styles.link}>💰 Prices</Link>
           <Link to="/analytics" style={styles.link}>📊 Trends</Link>
-          <Link to="/about" style={styles.link}>ℹ️ About Us</Link>
-          <Link to="/contact" style={styles.link}>✉️ Contact</Link>
+          <a href="/#about" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px' }}>
+          ℹ️ About Us
+          </a>
+          <a href="/#contact" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px' }}>
+          ✉️ Contact
+          </a>
         </div>
 
         <div style={styles.userSection}>

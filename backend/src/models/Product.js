@@ -9,7 +9,6 @@ const productSchema = mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ['Rice', 'Vegetables', 'Fruits', 'Meat', 'Dairy', 'Spices', 'Other'], 
   },
   unit: {
     type: String,
