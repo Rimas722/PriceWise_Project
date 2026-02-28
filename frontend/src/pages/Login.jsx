@@ -84,6 +84,10 @@ const Login = () => {
             <button type="submit" style={styles.primaryButton}>Sign In</button>
             <button type="button" onClick={handleReset} style={styles.secondaryButton}>Clear</button>
           </div>
+
+          <div style={{ marginTop: '15px', textAlign: 'center' }}>
+            <Link to="/forgot-password" style={{ color: '#e74c3c', textDecoration: 'none', fontSize: '0.9rem' }}>Forgot Password?</Link>
+          </div>
         </form>
 
         <div style={{ marginTop: '25px', textAlign: 'center', fontSize: '0.9rem', color: '#555' }}>

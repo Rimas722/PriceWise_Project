@@ -2,12 +2,13 @@ const Report = require('../models/Report');
 
 const createReport = async (req, res) => {
   try {
-    const { price, reason } = req.body;
+    const { price, reason, proofImage } = req.body;
     
     const Report = require('../models/Report'); 
     const report = new Report({
       price,
       reason,
+      proofImage,
       reportedBy: req.user._id
     });
 

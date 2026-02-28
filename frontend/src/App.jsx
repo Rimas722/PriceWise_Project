@@ -16,6 +16,9 @@ import Analytics from './pages/Analytics';
 import Support from './pages/Support';
 import AddProduct from './pages/AddProduct'; 
 import Footer from './components/Footer';
+import VerifyEmail from './pages/VerifyEmail';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 const HomeRoute = ({ children }) => {
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
@@ -45,6 +48,9 @@ const App = () => {
         <Route path="/shop/:id" element={<ShopProfile />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/support" element={<Support />} />
+        <Route path="/verify/:token" element={<VerifyEmail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
 
         <Route path="/add-price" element={<AddPrice />} />
         <Route path="/dashboard" element={<UserDashboard />} />

@@ -149,7 +149,7 @@ const UserDashboard = () => {
         {showModal && (
           <div style={modalOverlayStyle}>
             <div style={modalContentStyle}>
-              <h2 style={{ marginTop: 0, color: '#2c3e50' }}>📸 Report a Price</h2>
+              <h2 style={{ marginTop: 0, color: '#2c3e50' }}>📸 Add a New Price</h2>
               <p style={{ color: '#7f8c8d', marginBottom: '20px', fontSize: '0.9rem' }}>
                 Help the community by submitting a new price. An Admin will verify your submission.
               </p>

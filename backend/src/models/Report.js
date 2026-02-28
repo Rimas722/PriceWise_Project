@@ -20,6 +20,10 @@ const reportSchema = mongoose.Schema({
     enum: ['pending', 'resolved'],
     default: 'pending',
   },
+  proofImage: {
+    type: String,
+    default: '' 
+  }
 }, {
   timestamps: true,
 });

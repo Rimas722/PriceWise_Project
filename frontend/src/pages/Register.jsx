@@ -25,15 +25,9 @@ const Register = () => {
         config
       );
 
-      localStorage.setItem('userInfo', JSON.stringify(data));
-      
-      console.log("Registration Success:", data);
+      alert(data.message || 'Registration successful! Please check your email to verify your account.');
 
-      if (data.role === 'shop_owner') {
-        navigate('/register-shop');  
-      } else {
-        navigate('/prices');      
-      }
+      navigate('/login');
 
     } catch (err) {
       setError(err.response?.data?.message || 'Error registering account. Email might be in use.');
