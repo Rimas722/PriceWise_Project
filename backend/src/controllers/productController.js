@@ -5,12 +5,13 @@ const getProducts = async (req, res) => {
 };
 
 const createProduct = async (req, res) => {
-  const { name, category, unit, image } = req.body;
+  const { name, category, subCategory, unit, image } = req.body;
 
   try {
     const product = new Product({
       name,
       category,
+      subCategory: subCategory || 'General',
       unit,
       image: image || 'https://placehold.co/200x200?text=No+Image' 
     });
@@ -22,14 +23,20 @@ const createProduct = async (req, res) => {
   }
 };
 
-  const updateProduct = async (req, res) => {
+const updateProduct = async (req, res) => {
   try {
+    const { name, category, subCategory, image, unit } = req.body; 
+
     const product = await Product.findById(req.params.id);
 
     if (product) {
-      product.name = req.body.name || product.name;
-      product.image = req.body.image || product.image;
-      product.category = req.body.category || product.category; 
+      product.name = name || product.name;
+      product.category = category || product.category;
+      
+      product.subCategory = subCategory || product.subCategory; 
+      
+      product.image = image || product.image;
+      if (unit) product.unit = unit;
 
       const updatedProduct = await product.save();
       res.json(updatedProduct);
@@ -37,7 +44,6 @@ const createProduct = async (req, res) => {
       res.status(404).json({ message: 'Product not found' });
     }
   } catch (error) {
-    console.error("🚨 CRASH REASON:", error);
     res.status(500).json({ message: error.message });
   }
 };

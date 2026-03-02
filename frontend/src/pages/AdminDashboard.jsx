@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState('prices'); 
+  const [activeTab, setActiveTab] = useState('categories'); 
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -14,8 +14,11 @@ const AdminDashboard = () => {
   const [newImage, setNewImage] = useState('');
   const [newName, setNewName] = useState('');
   const [editCategory, setEditCategory] = useState('');
+  const [subCategory, setSubCategory] = useState(''); 
   const [uploading, setUploading] = useState(false);
+  
   const [newCategory, setNewCategory] = useState('');
+  const [subCategoryInputs, setSubCategoryInputs] = useState({});
 
   const [editingShop, setEditingShop] = useState(null);
   const [editShopName, setEditShopName] = useState('');
@@ -66,7 +69,8 @@ const AdminDashboard = () => {
       await axios.put(`http://localhost:5000/api/products/${editingProduct._id}`, {
         image: newImage || editingProduct.image,
         name: newName || editingProduct.name,
-        category: editCategory || editingProduct.category 
+        category: editCategory || editingProduct.category,
+        subCategory: subCategory 
       }, config);
       alert('Product Updated!');
       setEditingProduct(null);
@@ -138,6 +142,18 @@ const AdminDashboard = () => {
       fetchAll();
     } catch (error) {
       alert('Category already exists or error');
+    }
+  };
+
+  const handleAddSubCategory = async (categoryId) => {
+    const subCatName = subCategoryInputs[categoryId];
+    if (!subCatName) return;
+    try {
+      await axios.put(`http://localhost:5000/api/categories/${categoryId}/subcategory`, { subCategory: subCatName }, config);
+      setSubCategoryInputs({ ...subCategoryInputs, [categoryId]: '' }); 
+      fetchAll();
+    } catch (error) {
+      alert(error.response?.data?.message || 'Error adding sub-category');
     }
   };
 
@@ -292,20 +308,10 @@ const AdminDashboard = () => {
                   <h3>Edit Shop Details</h3>
                   
                   <label style={{display:'block', textAlign:'left', fontWeight:'bold', marginBottom:'5px'}}>Shop Name:</label>
-                  <input 
-                    type="text" 
-                    value={editShopName} 
-                    onChange={(e) => setEditShopName(e.target.value)} 
-                    style={inputFieldStyle}
-                  />
+                  <input type="text" value={editShopName} onChange={(e) => setEditShopName(e.target.value)} style={inputFieldStyle} />
 
                   <label style={{display:'block', textAlign:'left', fontWeight:'bold', marginBottom:'5px'}}>Address:</label>
-                  <input 
-                    type="text" 
-                    value={editShopAddress} 
-                    onChange={(e) => setEditShopAddress(e.target.value)} 
-                    style={inputFieldStyle}
-                  />
+                  <input type="text" value={editShopAddress} onChange={(e) => setEditShopAddress(e.target.value)} style={inputFieldStyle} />
                   
                   <div style={{marginTop:'30px', display:'flex', justifyContent:'center', gap:'10px'}}>
                     <button onClick={handleUpdateShop} style={btnGreen}>Save Changes</button>
@@ -328,6 +334,7 @@ const AdminDashboard = () => {
                 <th style={{padding:'15px'}}>Image</th>
                 <th style={{padding:'15px'}}>Name</th>
                 <th style={{padding:'15px'}}>Category</th>
+                <th style={{padding:'15px'}}>Sub-Category</th>
                 <th style={{padding:'15px'}}>Action</th>
               </tr></thead>
               <tbody>
@@ -338,12 +345,14 @@ const AdminDashboard = () => {
                     </td>
                     <td style={{padding:'15px', fontWeight:'bold', verticalAlign: 'middle'}}>{p.name}</td>
                     <td style={{padding:'15px', verticalAlign: 'middle'}}>{p.category}</td>
+                    <td style={{padding:'15px', verticalAlign: 'middle'}}>{p.subCategory || 'General'}</td>
                     <td style={{padding:'15px', verticalAlign: 'middle'}}>
                       <button onClick={() => { 
                         setEditingProduct(p); 
                         setNewImage(p.image); 
                         setNewName(p.name); 
                         setEditCategory(p.category); 
+                        setSubCategory(p.subCategory || ''); 
                       }} style={btnBlue}>Edit</button>
                       <button onClick={() => { handleDeleteProduct(p._id); }} style={{...btnRed, marginLeft:'10px'}}>Delete</button>
                     </td>
@@ -358,12 +367,7 @@ const AdminDashboard = () => {
                   <h3>Edit Product</h3>
                   
                   <label style={{display:'block', textAlign:'left', fontWeight:'bold', marginBottom:'5px'}}>Product Name:</label>
-                  <input 
-                    type="text" 
-                    value={newName} 
-                    onChange={(e) => setNewName(e.target.value)} 
-                    style={inputFieldStyle}
-                  />
+                  <input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} style={inputFieldStyle} />
 
                   <label style={{display:'block', textAlign:'left', fontWeight:'bold', marginBottom:'5px'}}>Product Image:</label>
                   <img src={getImageUrl(newImage) || getImageUrl(editingProduct.image) || 'https://placehold.co/100'} alt="" style={{width:'100px', height:'100px', objectFit:'cover', marginBottom:'10px', borderRadius:'5px', border:'1px solid #ddd'}} />
@@ -374,12 +378,27 @@ const AdminDashboard = () => {
                   <label style={{display:'block', textAlign:'left', fontWeight:'bold', marginBottom:'5px'}}>Category:</label>
                   <select 
                     value={editCategory} 
-                    onChange={(e) => setEditCategory(e.target.value)} 
+                    onChange={(e) => {
+                      setEditCategory(e.target.value);
+                      setSubCategory('');
+                    }} 
                     style={inputFieldStyle}
                   >
                     <option value="">-- Select Category --</option>
                     {categories.map(c => (
                       <option key={c._id} value={c.name}>{c.name}</option>
+                    ))}
+                  </select>
+
+                  <label style={{display:'block', textAlign:'left', fontWeight:'bold', marginBottom:'5px'}}>Sub-Category (Optional):</label>
+                  <select 
+                    value={subCategory} 
+                    onChange={(e) => setSubCategory(e.target.value)} 
+                    style={inputFieldStyle}
+                  >
+                    <option value="">-- General / None --</option>
+                    {categories.find(c => c.name === editCategory)?.subCategories?.map(sub => (
+                      <option key={sub} value={sub}>{sub}</option>
                     ))}
                   </select>
                   
@@ -402,17 +421,41 @@ const AdminDashboard = () => {
               <input 
                 value={newCategory} 
                 onChange={(e) => setNewCategory(e.target.value)} 
-                placeholder="New Category Name" 
+                placeholder="New Main Category Name" 
                 style={{padding:'12px', width:'300px', borderRadius:'5px', border:'1px solid #ccc'}}
               />
-              <button onClick={handleAddCategory} style={btnBlue}>+ Add Category</button>
+              <button onClick={handleAddCategory} style={btnBlue}>+ Add Main Category</button>
             </div>
             <div style={{background:'white', padding:'20px', borderRadius:'10px', boxShadow:'0 2px 5px rgba(0,0,0,0.1)'}}>
               <ul style={{listStyle:'none', padding:0, margin: 0}}>
                 {categories.map(c => (
-                   <li key={c._id} style={{padding:'15px', borderBottom:'1px solid #eee', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                      <span style={{fontWeight:'bold', fontSize:'1.1rem', color: '#2c3e50'}}>{c.name}</span>
-                      <button onClick={() => handleDeleteCategory(c._id)} style={btnRed}>Delete</button>
+                   <li key={c._id} style={{padding:'20px 15px', borderBottom:'1px solid #eee', display:'flex', flexDirection: 'column'}}>
+                      <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                        <span style={{fontWeight:'bold', fontSize:'1.2rem', color: '#2c3e50'}}>{c.name}</span>
+                        <button onClick={() => handleDeleteCategory(c._id)} style={btnRed}>Delete</button>
+                      </div>
+
+                      <div style={{marginTop: '15px', paddingLeft: '20px', borderLeft: '3px solid #3498db'}}>
+                        <div style={{display:'flex', gap:'10px', marginBottom: '10px'}}>
+                          <input
+                            placeholder="Add Sub-Category (e.g., Leafy Greens)"
+                            value={subCategoryInputs[c._id] || ''}
+                            onChange={(e) => setSubCategoryInputs({...subCategoryInputs, [c._id]: e.target.value})}
+                            style={{padding: '8px', borderRadius: '4px', border: '1px solid #bdc3c7', flex: 1, maxWidth: '250px'}}
+                          />
+                          <button onClick={() => handleAddSubCategory(c._id)} style={{...btnBlue, padding: '8px 15px'}}>Add Sub</button>
+                        </div>
+                        
+                        <div style={{display: 'flex', gap: '8px', flexWrap: 'wrap'}}>
+                          {c.subCategories?.length === 0 && <span style={{fontSize: '0.85rem', color: '#95a5a6'}}>No sub-categories yet.</span>}
+                          {c.subCategories?.map(sub => (
+                            <span key={sub} style={{background: '#ecf0f1', padding: '5px 10px', borderRadius: '15px', fontSize: '0.85rem', color: '#2c3e50', border: '1px solid #bdc3c7'}}>
+                              {sub}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
                    </li>
                 ))}
               </ul>
@@ -460,25 +503,16 @@ const AdminDashboard = () => {
 };
 
 const itemStyle = (active) => ({
-  padding: '15px', 
-  cursor: 'pointer', 
-  background: active ? '#34495e' : 'transparent', 
-  border: 'none', 
-  color: 'white', 
-  textAlign: 'left', 
-  fontSize: '1rem',
-  borderLeft: active ? '5px solid #3498db' : '5px solid transparent',
-  transition: '0.2s'
+  padding: '15px', cursor: 'pointer', background: active ? '#34495e' : 'transparent', border: 'none', color: 'white', textAlign: 'left', fontSize: '1rem', borderLeft: active ? '5px solid #3498db' : '5px solid transparent', transition: '0.2s'
 });
 
 const headerFlexStyle = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingBottom: '10px', borderBottom: '2px solid #ecf0f1' };
 const tableStyle = { width: '100%', borderCollapse: 'collapse', background: 'white', boxShadow:'0 2px 10px rgba(0,0,0,0.05)', borderRadius:'8px', overflow:'hidden' };
 const inputFieldStyle = { width: '100%', padding: '12px', marginBottom: '20px', border: '1px solid #ccc', borderRadius: '5px', boxSizing: 'border-box' };
-
 const btnGreen = { padding: '10px 20px', background: '#2ecc71', color: 'white', border: 'none', borderRadius:'5px', cursor: 'pointer', fontWeight:'bold' };
 const btnRed = { padding: '10px 20px', background: '#e74c3c', color: 'white', border: 'none', borderRadius:'5px', cursor: 'pointer', fontWeight:'bold' };
 const btnBlue = { padding: '10px 20px', background: '#3498db', color: 'white', border: 'none', borderRadius:'5px', cursor: 'pointer', fontWeight:'bold' };
 const modalStyle = { position:'fixed', top:0, left:0, width:'100%', height:'100%', background:'rgba(0,0,0,0.6)', display:'flex', justifyContent:'center', alignItems:'center', zIndex:1000 };
-const modalContentStyle = { background:'white', padding:'30px', borderRadius:'10px', width:'400px', textAlign:'center', boxShadow:'0 5px 15px rgba(0,0,0,0.3)' };
+const modalContentStyle = { background:'white', padding:'30px', borderRadius:'10px', width:'400px', textAlign:'center', boxShadow:'0 5px 15px rgba(0,0,0,0.3)', maxHeight: '90vh', overflowY: 'auto' };
 
 export default AdminDashboard;

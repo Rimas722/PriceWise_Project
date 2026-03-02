@@ -9,7 +9,10 @@ const categorySchema = mongoose.Schema({
   icon: {
     type: String, 
     default: '📦'
-  }
+  },
+  subCategories: [{ 
+    type: String 
+  }]
 }, {
   timestamps: true,
 });

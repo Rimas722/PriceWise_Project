@@ -10,6 +10,10 @@ const productSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  subCategory: { 
+    type: String, 
+    default: 'General' 
+  },
   unit: {
     type: String,
     required: true,

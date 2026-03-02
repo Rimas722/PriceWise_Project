@@ -7,6 +7,7 @@ const PriceComparison = () => {
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+  const [selectedSubCategory, setSelectedSubCategory] = useState('');
   const [sortOption, setSortOption] = useState('cheapest');
   const [loading, setLoading] = useState(true);
 
@@ -154,6 +155,13 @@ const PriceComparison = () => {
     }
   };
 
+  const availableSubCategories = [...new Set(
+    prices
+      .filter(item => selectedCategory === '' || item.product?.category === selectedCategory)
+      .map(item => item.product?.subCategory)
+      .filter(Boolean) 
+  )];
+
   const filteredPrices = prices
     .filter((price) => {
       if (!price.product) return false; 
@@ -167,7 +175,10 @@ const PriceComparison = () => {
       const category = price.product.category || '';
       const matchesCategory = selectedCategory === '' || category === selectedCategory;
 
-      return matchesSearch && matchesCategory;
+      const subCategory = price.product.subCategory || '';
+      const matchesSubCategory = selectedSubCategory === '' || subCategory === selectedSubCategory;
+
+      return matchesSearch && matchesCategory && matchesSubCategory;
     })
     .sort((a, b) => {
       if (sortOption === 'cheapest') return a.price - b.price;
@@ -203,7 +214,10 @@ const PriceComparison = () => {
 
           <select 
             value={selectedCategory} 
-            onChange={(e) => setSelectedCategory(e.target.value)}
+            onChange={(e) => {
+              setSelectedCategory(e.target.value);
+              setSelectedSubCategory(''); 
+            }}
             style={dropdownStyle}
           >
             <option value="">🛒 All Categories</option>
@@ -211,6 +225,19 @@ const PriceComparison = () => {
               <option key={c._id} value={c.name}>{c.name}</option>
             ))}
           </select>
+
+          {selectedCategory && availableSubCategories.length > 0 && (
+            <select 
+              value={selectedSubCategory} 
+              onChange={(e) => setSelectedSubCategory(e.target.value)} 
+              style={{ ...dropdownStyle, borderColor: '#3498db', backgroundColor: '#ebf5fb', color: '#2980b9', fontWeight: 'bold' }}
+            >
+              <option value="">📂 All in {selectedCategory}</option>
+              {availableSubCategories.map(subCat => (
+                <option key={subCat} value={subCat}>{subCat}</option>
+              ))}
+            </select>
+          )}
 
           <select 
             value={sortOption} 
@@ -365,7 +392,6 @@ const PriceComparison = () => {
     </div>
   );
 };
-
 
 const filterContainerStyle = { display: 'flex', gap: '15px', backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', flexWrap: 'wrap', justifyContent: 'center' };
 const searchInputStyle = { flex: '1', minWidth: '250px', padding: '12px 20px', borderRadius: '8px', border: '1px solid #dfe6e9', fontSize: '1rem', outline: 'none' };
