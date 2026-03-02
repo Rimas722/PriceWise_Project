@@ -14,6 +14,12 @@ const ShopOwnerDashboard = () => {
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
 
+  const getImageUrl = (imagePath) => {
+    if (!imagePath) return '';
+    if (imagePath.startsWith('http')) return imagePath;
+    return `http://localhost:5000${imagePath}`; 
+  };
+
   const fetchData = async () => {
     try {
       const shopRes = await axios.get('http://localhost:5000/api/shops/myshop', config);
@@ -55,6 +61,17 @@ const ShopOwnerDashboard = () => {
       } catch (error) {
         alert('Error deleting item');
       }
+    }
+  };
+
+  const handleToggleStock = async (priceId) => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+      await axios.put(`http://localhost:5000/api/prices/${priceId}/stock`, {}, config);
+      
+      window.location.reload(); 
+    } catch (error) {
+      alert(error.response?.data?.message || 'Error updating stock status.');
     }
   };
 
@@ -106,15 +123,38 @@ const ShopOwnerDashboard = () => {
                   {myPrices.map((price) => (
                     <tr key={price._id} style={{ borderBottom: '1px solid #eee' }}>
                       <td style={{ padding: '10px', display:'flex', alignItems:'center', gap:'10px' }}>
-                         <img src={price.product?.image || 'https://placehold.co/40'} alt="" style={{width:'40px', height:'40px', borderRadius:'5px'}}/>
-                         {price.product?.name}
+                         <img 
+                            src={getImageUrl(price.product?.image) || 'https://placehold.co/40'} 
+                            alt={price.product?.name || "Product"} 
+                            style={{width:'40px', height:'40px', borderRadius:'5px', objectFit: 'cover'}}
+                          />
                       </td>
                       <td style={{ padding: '10px', fontWeight: 'bold', color: 'green' }}>Rs. {price.price}</td>
                       <td style={{ padding: '10px' }}>
                         {price.status === 'approved' ? '✅ Live' : '⏳ Review'}
                       </td>
-                      <td style={{ padding: '10px' }}>
-                        <button onClick={() => handleDeletePrice(price._id)} style={{ backgroundColor: '#e74c3c', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '3px', cursor: 'pointer' }}>
+
+                      <td>
+                        <button 
+                          onClick={() => handleToggleStock(price._id)} 
+                          style={{ 
+                            backgroundColor: price.inStock === false ? '#27ae60' : '#f39c12', 
+                            color: 'white', 
+                            border: 'none', 
+                            padding: '6px 12px', 
+                            borderRadius: '5px', 
+                            marginRight: '10px', 
+                            cursor: 'pointer',
+                            fontWeight: 'bold'
+                          }}
+                        >
+                          {price.inStock === false ? '📦 Mark In Stock' : '🚫 Mark Out of Stock'}
+                        </button>
+
+                        <button 
+                          onClick={() => handleDeletePrice(price._id)} 
+                          style={{ backgroundColor: '#e74c3c', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '5px', cursor: 'pointer' }}
+                        >
                           Delete
                         </button>
                       </td>

@@ -79,6 +79,17 @@ const PriceComparison = () => {
     }
   };
 
+  const handleToggleStock = async (priceId) => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+      await axios.put(`http://localhost:5000/api/prices/${priceId}/stock`, {}, config);
+      
+      window.location.reload(); 
+    } catch (error) {
+      alert(error.response?.data?.message || 'Error updating stock status.');
+    }
+  };
+
   const openReportModal = (priceId) => {
     if (!userInfo) {
       alert("🔐 Please login to report prices!");
@@ -228,6 +239,14 @@ const PriceComparison = () => {
                     style={imageStyle} 
                   />
                   <span style={categoryBadgeStyle}>{item.product?.category}</span>
+
+                  {item.inStock === false && (
+                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(255,255,255,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10 }}>
+                      <span style={{ backgroundColor: '#e74c3c', color: 'white', padding: '10px 20px', borderRadius: '5px', fontSize: '1.2rem', fontWeight: 'bold', transform: 'rotate(-15deg)', border: '3px solid white', boxShadow: '0 4px 10px rgba(0,0,0,0.2)' }}>
+                        OUT OF STOCK
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
@@ -261,25 +280,34 @@ const PriceComparison = () => {
                   </div>
                 </div>
 
-                <div style={cardFooterStyle}>
+                <div style={{ display: 'flex', justifyContent: 'space-around', padding: '15px', borderTop: '1px solid #f1f2f6' }}>
                   <button onClick={() => handleSave(item._id)} style={actionBtnStyle}>
                     ❤️ Save
                   </button>
-
                   <button onClick={() => handleUpvote(item._id)} style={{...actionBtnStyle, color: '#27ae60'}}>
                     👍 Helpful ({item.helpfulVotes?.length || 0})
                   </button>
-
                   <button onClick={() => openReportModal(item._id)} style={{...actionBtnStyle, color: '#e74c3c'}}>
                     🚩 Report
                   </button>
+                </div>
 
-                  {userInfo?.role === 'admin' && (
-                    <button onClick={() => handleDeletePrice(item._id)} style={{...actionBtnStyle, color: 'white', backgroundColor: '#e74c3c'}}>
+                {userInfo?.role === 'admin' && (
+                  <div style={{ display: 'flex', width: '100%', borderTop: '1px solid #f1f2f6' }}>
+                    <button 
+                      onClick={() => handleToggleStock(item._id)} 
+                      style={{ flex: 1, padding: '12px', color: 'white', backgroundColor: item.inStock === false ? '#27ae60' : '#f39c12', border: 'none', fontWeight: 'bold', cursor: 'pointer', borderBottomLeftRadius: '10px' }}
+                    >
+                      {item.inStock === false ? '📦 Mark In Stock' : '🚫 Mark Out of Stock'}
+                    </button>
+                    <button 
+                      onClick={() => handleDeletePrice(item._id)} 
+                      style={{ flex: 1, padding: '12px', color: 'white', backgroundColor: '#c0392b', border: 'none', fontWeight: 'bold', cursor: 'pointer', borderLeft: '1px solid white', borderBottomRightRadius: '10px' }}
+                    >
                       🗑️ Delete
                     </button>
-                  )}
-                </div>
+                  </div>
+                )}
 
               </div>
             ))}

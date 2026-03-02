@@ -43,7 +43,7 @@ const createPrice = async (req, res) => {
 const getMyPrices = async (req, res) => {
   try {
     const prices = await Price.find({ submittedBy: req.user._id })
-      .populate('product', 'name unit')
+      .populate('product', 'name unit image category')
       .populate('shop', 'shopName');
       
     res.json(prices);
@@ -185,5 +185,22 @@ const upvotePrice = async (req, res) => {
   }
 };
 
+const toggleStockStatus = async (req, res) => {
+  try {
+    const price = await Price.findById(req.params.id);
+    
+    if (!price) {
+      return res.status(404).json({ message: 'Price not found' });
+    }
 
-module.exports = { getPrices, createPrice, getMyPrices, deletePrice, approvePrice, getAllPricesAdmin, getPriceAnalytics, upvotePrice };
+    price.inStock = !price.inStock; 
+    await price.save();
+
+    res.json({ message: `Item marked as ${price.inStock ? 'In Stock' : 'Out of Stock'}`, inStock: price.inStock });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+module.exports = { getPrices, createPrice, getMyPrices, deletePrice, approvePrice, getAllPricesAdmin, getPriceAnalytics, upvotePrice, toggleStockStatus };
