@@ -19,6 +19,15 @@ const PriceComparison = () => {
   const navigate = useNavigate();
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
+  const getBadge = (pts) => {
+    if (!pts && pts !== 0) return '';
+    if (pts < 100) return '🥉 Lvl 1';
+    if (pts < 300) return '🥈 Lvl 2';
+    if (pts < 600) return '🥇 Lvl 3';
+    if (pts < 1000) return '💎 Lvl 4';
+    return '👑 Lvl 5';
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -49,6 +58,24 @@ const PriceComparison = () => {
       alert('❤️ Saved to your Watchlist!');
     } catch (error) {
       alert(error.response?.data?.message || 'Error saving item.');
+    }
+  };
+
+  const handleUpvote = async (priceId) => {
+    if (!userInfo) {
+      alert("🔐 Please login to vote!");
+      return;
+    }
+    
+    try {
+      const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+      await axios.put(`http://localhost:5000/api/prices/${priceId}/upvote`, {}, config);
+      
+      alert('👍 You marked this as helpful! The submitter earned +2 points.');
+      
+      window.location.reload(); 
+    } catch (error) {
+      alert(error.response?.data?.message || 'Error voting.');
     }
   };
 
@@ -212,6 +239,18 @@ const PriceComparison = () => {
                     🏪 <strong>{item.shop?.shopName}</strong>
                   </div>
 
+                  {item.submittedBy && (
+                    <div style={{ fontSize: '0.8rem', color: '#95a5a6', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      👤 Spotted by: 
+                      <span style={{ fontWeight: 'bold', color: '#2c3e50' }}>
+                        {item.submittedBy.name}
+                      </span>
+                      <span style={{ backgroundColor: '#fff3cd', color: '#856404', padding: '2px 6px', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 'bold', border: '1px solid #ffeeba' }}>
+                        {getBadge(item.submittedBy.points)}
+                      </span>
+                    </div>
+                  )}
+
                   <div style={{ marginTop: 'auto' }}>
                     <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#27ae60' }}>
                       Rs. {item.price}
@@ -225,6 +264,10 @@ const PriceComparison = () => {
                 <div style={cardFooterStyle}>
                   <button onClick={() => handleSave(item._id)} style={actionBtnStyle}>
                     ❤️ Save
+                  </button>
+
+                  <button onClick={() => handleUpvote(item._id)} style={{...actionBtnStyle, color: '#27ae60'}}>
+                    👍 Helpful ({item.helpfulVotes?.length || 0})
                   </button>
 
                   <button onClick={() => openReportModal(item._id)} style={{...actionBtnStyle, color: '#e74c3c'}}>

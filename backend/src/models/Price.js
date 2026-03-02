@@ -24,12 +24,17 @@ const priceSchema = mongoose.Schema({
     type: String, default: ""
   },
   submittedBy: {
-     type: mongoose.Schema.Types.ObjectId, ref: 'User' 
+     type: mongoose.Schema.Types.ObjectId,
+     ref: 'User' 
     },
   status: {
     type: String,
     enum: ['pending', 'approved', 'rejected'], 
     default: 'pending',
+  },
+  helpfulVotes: { 
+    type: mongoose.Schema.Types.ObjectId, 
+    ref: 'User' 
   },
 }, {
   timestamps: true, 
