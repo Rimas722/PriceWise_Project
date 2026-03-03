@@ -11,6 +11,11 @@ const PriceComparison = () => {
   const [sortOption, setSortOption] = useState('cheapest');
   const [loading, setLoading] = useState(true);
 
+  const [userLocation, setUserLocation] = useState(null);
+  const [locationError, setLocationError] = useState('');
+  const [maxDistance, setMaxDistance] = useState(5); 
+  const [findingLocation, setFindingLocation] = useState(false);
+
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportPriceId, setReportPriceId] = useState(null);
   const [reportReason, setReportReason] = useState('');
@@ -45,6 +50,52 @@ const PriceComparison = () => {
     };
     fetchData();
   }, []);
+
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    if (!lat1 || !lon1 || !lat2 || !lon2) return Infinity; 
+
+    const R = 6371; 
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; 
+    return distance;
+  };
+
+  const handleFindMyArea = () => {
+    if (!navigator.geolocation) {
+      setLocationError("Geolocation is not supported by your browser.");
+      return;
+    }
+    
+    setFindingLocation(true);
+    setLocationError('');
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserLocation({
+          lat: position.coords.latitude,
+          lon: position.coords.longitude
+        });
+        setFindingLocation(false);
+        alert(`📍 Found you! Showing results within ${maxDistance}km.`);
+      },
+      (error) => {
+        console.error("Error getting location", error);
+        setLocationError("Couldn't find your location. Please check browser permissions.");
+        setFindingLocation(false);
+      }
+    );
+  };
+  
+  const clearLocationFilter = () => {
+      setUserLocation(null);
+  };
+
 
   const handleSave = async (priceId) => {
     if (!userInfo) {
@@ -178,7 +229,19 @@ const PriceComparison = () => {
       const subCategory = price.product.subCategory || '';
       const matchesSubCategory = selectedSubCategory === '' || subCategory === selectedSubCategory;
 
-      return matchesSearch && matchesCategory && matchesSubCategory;
+      let matchesDistance = true;
+      if (userLocation && price.shop?.latitude && price.shop?.longitude) {
+         const distanceToShop = calculateDistance(
+             userLocation.lat, 
+             userLocation.lon, 
+             price.shop.latitude, 
+             price.shop.longitude
+         );
+         matchesDistance = distanceToShop <= maxDistance;
+         price.calculatedDistance = distanceToShop;
+      }
+
+      return matchesSearch && matchesCategory && matchesSubCategory && matchesDistance;
     })
     .sort((a, b) => {
       if (sortOption === 'cheapest') return a.price - b.price;
@@ -201,6 +264,42 @@ const PriceComparison = () => {
         <div style={{ textAlign: 'center', marginBottom: '40px' }}>
           <h1 style={{ color: '#2c3e50', fontSize: '2.5rem', marginBottom: '10px' }}>💰 Live Market Prices</h1>
           <p style={{ color: '#7f8c8d', fontSize: '1.1rem' }}>Find the best deals in your city today.</p>
+        </div>
+
+        <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <span style={{ fontWeight: 'bold', color: '#34495e' }}>🌍 Find deals near me:</span>
+                
+                <select 
+                    value={maxDistance} 
+                    onChange={(e) => setMaxDistance(Number(e.target.value))}
+                    style={{ padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}
+                >
+                    <option value={2}>Within 2 km</option>
+                    <option value={5}>Within 5 km</option>
+                    <option value={10}>Within 10 km</option>
+                    <option value={25}>Within 25 km</option>
+                </select>
+
+                {!userLocation ? (
+                   <button 
+                       onClick={handleFindMyArea}
+                       disabled={findingLocation}
+                       style={{ padding: '10px 20px', backgroundColor: '#3498db', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}
+                   >
+                       {findingLocation ? '⏳ Locating...' : '📍 Use My Location'}
+                   </button>
+                ) : (
+                    <button 
+                       onClick={clearLocationFilter}
+                       style={{ padding: '10px 20px', backgroundColor: '#e74c3c', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}
+                   >
+                       ❌ Clear Location Filter
+                   </button>
+                )}
+            </div>
+            {locationError && <span style={{ color: '#e74c3c', fontSize: '0.9rem' }}>{locationError}</span>}
+            {userLocation && <span style={{ color: '#27ae60', fontSize: '0.9rem', fontWeight: 'bold' }}>✅ Showing results within {maxDistance}km of your location.</span>}
         </div>
 
         <div style={filterContainerStyle}>
@@ -252,7 +351,7 @@ const PriceComparison = () => {
 
         {filteredPrices.length === 0 ? (
           <div style={{ textAlign: 'center', marginTop: '50px', color: '#7f8c8d', fontSize: '1.2rem' }}>
-            No products found matching your search.
+            No products found matching your search. Try expanding your search area or clearing filters.
           </div>
         ) : (
           <div style={gridStyle}>
@@ -281,8 +380,13 @@ const PriceComparison = () => {
                     {item.product?.name}
                   </h3>
                   
-                  <div style={{ color: '#7f8c8d', fontSize: '0.9rem', marginBottom: '15px', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                    🏪 <strong>{item.shop?.shopName}</strong>
+                  <div style={{ color: '#7f8c8d', fontSize: '0.9rem', marginBottom: '15px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                    <span>🏪 <strong>{item.shop?.shopName}</strong></span>
+                    {userLocation && item.calculatedDistance !== undefined && (
+                         <span style={{ color: '#e67e22', fontWeight: 'bold', fontSize: '0.85rem' }}>
+                             📍 Approx. {item.calculatedDistance.toFixed(1)} km away
+                         </span>
+                    )}
                   </div>
 
                   {item.submittedBy && (
@@ -400,7 +504,6 @@ const gridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, min
 const cardStyle = { backgroundColor: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 6px 15px rgba(0,0,0,0.08)', display: 'flex', flexDirection: 'column', border: '1px solid #f1f2f6' };
 const imageStyle = { width: '100%', height: '200px', objectFit: 'cover', borderBottom: '1px solid #f1f2f6' };
 const categoryBadgeStyle = { position: 'absolute', top: '10px', right: '10px', backgroundColor: 'rgba(44, 62, 80, 0.9)', color: 'white', padding: '5px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 'bold' };
-const cardFooterStyle = { display: 'flex', borderTop: '1px solid #f1f2f6', backgroundColor: '#f8f9fa' };
 const actionBtnStyle = { flex: 1, padding: '12px', border: 'none', backgroundColor: 'transparent', cursor: 'pointer', fontWeight: 'bold', color: '#34495e', fontSize: '0.9rem', transition: '0.2s', borderRight: '1px solid #f1f2f6' };
 
 export default PriceComparison;

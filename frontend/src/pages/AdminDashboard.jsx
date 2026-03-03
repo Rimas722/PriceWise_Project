@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState('categories'); 
+  const [activeTab, setActiveTab] = useState('users'); 
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [prices, setPrices] = useState([]);
   const [shops, setShops] = useState([]);
   const [reports, setReports] = useState([]);
+  const [users, setUsers] = useState([]); 
 
   const [editingProduct, setEditingProduct] = useState(null);
   const [newImage, setNewImage] = useState('');
@@ -34,18 +35,32 @@ const AdminDashboard = () => {
       const priceRes = await axios.get('http://localhost:5000/api/prices/all', config);
       const shopRes = await axios.get('http://localhost:5000/api/shops/all', config);
       const reportRes = await axios.get('http://localhost:5000/api/reports', config);
+      const userRes = await axios.get('http://localhost:5000/api/users', config); 
       
       setProducts(prodRes.data);
       setCategories(catRes.data);
       setPrices(priceRes.data);
       setShops(shopRes.data);
       setReports(reportRes.data);
+      setUsers(userRes.data); 
     } catch (error) {
       console.error("Error fetching admin data", error);
     }
   };
 
   useEffect(() => { fetchAll(); }, []);
+
+  const handleDeleteUser = async (id) => {
+    if (window.confirm('🚨 WARNING: Are you sure you want to permanently delete this user?')) {
+      try {
+        await axios.delete(`http://localhost:5000/api/users/${id}`, config);
+        alert('User Deleted Successfully');
+        fetchAll();
+      } catch (error) {
+        alert(error.response?.data?.message || 'Error deleting user');
+      }
+    }
+  };
 
   const uploadFileHandler = async (e) => {
     const file = e.target.files[0];
@@ -200,6 +215,7 @@ const AdminDashboard = () => {
       <div style={{ width: '250px', backgroundColor: '#2c3e50', color: 'white', padding: '20px', display: 'flex', flexDirection: 'column' }}>
         <h2 style={{ textAlign: 'center', marginBottom: '40px' }}>🛡️ Admin</h2>
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <button onClick={() => setActiveTab('users')} style={itemStyle(activeTab === 'users')}>👥 Manage Users</button> {/* 👈 NEW TAB */}
           <button onClick={() => setActiveTab('prices')} style={itemStyle(activeTab === 'prices')}>✅ Price Approvals</button>
           <button onClick={() => setActiveTab('shops')} style={itemStyle(activeTab === 'shops')}>🏪 Manage Shops</button>
           <button onClick={() => setActiveTab('products')} style={itemStyle(activeTab === 'products')}>📦 Manage Products</button>
@@ -209,6 +225,54 @@ const AdminDashboard = () => {
       </div>
 
       <div style={{ flex: 1, padding: '40px', backgroundColor: '#f4f6f7', overflowY: 'auto' }}>
+
+        {activeTab === 'users' && (
+          <div>
+            <div style={headerFlexStyle}>
+               <h1 style={{ margin: 0 }}>👥 Manage Users</h1>
+            </div>
+            <table style={tableStyle}>
+              <thead><tr style={{background:'#ddd', textAlign: 'left'}}>
+                <th style={{padding:'15px'}}>Name</th>
+                <th style={{padding:'15px'}}>Email</th>
+                <th style={{padding:'15px'}}>Role</th>
+                <th style={{padding:'15px'}}>Points</th>
+                <th style={{padding:'15px'}}>Joined</th>
+                <th style={{padding:'15px'}}>Action</th>
+              </tr></thead>
+              <tbody>
+                {users.map(u => (
+                  <tr key={u._id} style={{borderBottom:'1px solid #eee'}}>
+                    <td style={{padding:'15px', fontWeight: 'bold', verticalAlign: 'middle'}}>{u.name}</td>
+                    <td style={{padding:'15px', color: '#555', verticalAlign: 'middle'}}>{u.email}</td>
+                    <td style={{padding:'15px', verticalAlign: 'middle'}}>
+                      <span style={{
+                        padding: '5px 10px', 
+                        borderRadius: '15px', 
+                        fontSize: '0.85rem', 
+                        fontWeight: 'bold',
+                        backgroundColor: u.role === 'admin' ? '#e74c3c' : u.role === 'shop_owner' ? '#f39c12' : '#3498db',
+                        color: 'white'
+                      }}>
+                        {u.role.replace('_', ' ').toUpperCase()}
+                      </span>
+                    </td>
+                    <td style={{padding:'15px', verticalAlign: 'middle'}}>{u.points || 0}</td>
+                    <td style={{padding:'15px', verticalAlign: 'middle'}}>{new Date(u.createdAt).toLocaleDateString()}</td>
+                    <td style={{padding:'15px', verticalAlign: 'middle'}}>
+                      {u.role !== 'admin' ? (
+                        <button onClick={() => handleDeleteUser(u._id)} style={btnRed}>Delete</button>
+                      ) : (
+                        <span style={{ color: '#95a5a6', fontStyle: 'italic', fontSize: '0.9rem' }}>Protected</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
 
         {activeTab === 'prices' && (
           <div>

@@ -11,6 +11,10 @@ const ShopOwnerDashboard = () => {
   const [address, setAddress] = useState('');
   const [phoneNumber, setPhone] = useState('');
 
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLongitude] = useState('');
+  const [locationLoading, setLocationLoading] = useState(false);
+
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
 
@@ -27,6 +31,8 @@ const ShopOwnerDashboard = () => {
       setShopName(shopRes.data.shopName);
       setAddress(shopRes.data.address);
       setPhone(shopRes.data.phoneNumber);
+      setLatitude(shopRes.data.latitude || ''); 
+      setLongitude(shopRes.data.longitude || '');
 
       const priceRes = await axios.get('http://localhost:5000/api/prices/my-prices', config);
       setMyPrices(priceRes.data);
@@ -44,12 +50,61 @@ const ShopOwnerDashboard = () => {
     e.preventDefault();
     try {
       await axios.put('http://localhost:5000/api/shops/myshop', {
-        shopName, address, phoneNumber
+        shopName, address, phoneNumber,
+        latitude, longitude
       }, config);
       alert('Shop Details Updated!');
       fetchData();
     } catch (error) {
       alert('Error updating shop');
+    }
+  };
+
+  const handleGetLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Your browser doesn't support geolocation.");
+      return;
+    }
+    
+    setLocationLoading(true);
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLatitude(position.coords.latitude);
+        setLongitude(position.coords.longitude);
+        setLocationLoading(false);
+        alert("📍 Location found! Don't forget to click 'Save Changes'.");
+      },
+      (error) => {
+        console.error("Error getting location", error);
+        alert("Couldn't get your location. Please check your browser permissions.");
+        setLocationLoading(false);
+      }
+    );
+  };
+
+  const handleGeocodeAddress = async () => {
+    if (!address) {
+      alert("Please enter a shop address in the text box above first!");
+      return;
+    }
+    
+    setLocationLoading(true);
+    try {
+      const response = await axios.get(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+      
+      if (response.data && response.data.length > 0) {
+        setLatitude(parseFloat(response.data[0].lat));
+        setLongitude(parseFloat(response.data[0].lon));
+        alert("🌍 Coordinates found based on your address!");
+      } else {
+        alert("Couldn't find exact coordinates. Try adding your city or district to the address.");
+      }
+    } catch (error) {
+      console.error("Geocoding error", error);
+      alert("Error fetching location from address.");
+    } finally {
+      setLocationLoading(false);
     }
   };
 
@@ -175,11 +230,50 @@ const ShopOwnerDashboard = () => {
               <input type="text" value={shopName} onChange={(e) => setShopName(e.target.value)} style={{ padding: '10px', border: '1px solid #bdc3c7', borderRadius: '5px' }} />
 
               <label>Address</label>
-              <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} style={{ padding: '10px', border: '1px solid #bdc3c7', borderRadius: '5px' }} />
-
+              <input 
+                type="text" 
+                placeholder="e.g., 123 Main Street, City Name, Province" 
+                value={address} 
+                onChange={(e) => setAddress(e.target.value)} 
+                style={{ padding: '10px', border: '1px solid #bdc3c7', borderRadius: '5px' }} 
+              />
+              
               <label>Phone Number</label>
               <input type="text" value={phoneNumber} onChange={(e) => setPhone(e.target.value)} style={{ padding: '10px', border: '1px solid #bdc3c7', borderRadius: '5px' }} />
 
+              <div style={{ backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '5px', border: '1px solid #dfe6e9' }}>
+                <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '10px' }}>Shop Location (GPS):</label>
+                
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
+                  <input type="text" placeholder="Latitude" value={latitude} disabled style={{ flex: 1, padding: '10px', border: '1px solid #bdc3c7', backgroundColor: '#ecf0f1', borderRadius: '5px' }} />
+                  <input type="text" placeholder="Longitude" value={longitude} disabled style={{ flex: 1, padding: '10px', border: '1px solid #bdc3c7', backgroundColor: '#ecf0f1', borderRadius: '5px' }} />
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button 
+                    type="button" 
+                    onClick={handleGetLocation} 
+                    disabled={locationLoading}
+                    style={{ flex: 1, backgroundColor: '#f39c12', color: 'white', padding: '10px', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem' }}
+                  >
+                    {locationLoading ? '⏳ Finding...' : '📍 Use My Device GPS'}
+                  </button>
+
+                  <button 
+                    type="button" 
+                    onClick={handleGeocodeAddress} 
+                    disabled={locationLoading}
+                    style={{ flex: 1, backgroundColor: '#3498db', color: 'white', padding: '10px', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.9rem' }}
+                  >
+                    {locationLoading ? '⏳ Searching...' : '🌍 Find from Typed Address'}
+                  </button>
+                </div>
+
+                <p style={{ fontSize: '0.8rem', color: '#7f8c8d', margin: '10px 0 0 0', fontStyle: 'italic' }}>
+                  Setting your coordinates accurately allows local consumers to find your shop within a 5km radius!
+                </p>
+              </div>
+              
               <button type="submit" style={{ backgroundColor: '#3498db', color: 'white', padding: '10px', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
                 Save Changes
               </button>

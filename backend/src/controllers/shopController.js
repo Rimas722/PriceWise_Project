@@ -122,6 +122,9 @@ const updateMyShop = async (req, res) => {
       shop.shopName = shopName || shop.shopName;
       shop.address = address || shop.address;
       shop.phoneNumber = phoneNumber || shop.phoneNumber;
+
+      if (req.body.latitude) shop.latitude = req.body.latitude;
+      if (req.body.longitude) shop.longitude = req.body.longitude;
       
       const updatedShop = await shop.save();
       res.json(updatedShop);

@@ -18,11 +18,16 @@ const shopSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  
   status: {
     type: String,
     enum: ['pending', 'approved', 'rejected'],
     default: 'pending', 
+  },
+  latitude: { 
+    type: Number 
+  },
+  longitude: { 
+    type: Number 
   },
 }, {
   timestamps: true,
