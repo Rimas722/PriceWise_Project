@@ -229,7 +229,7 @@ const AdminDashboard = () => {
         {activeTab === 'users' && (
           <div>
             <div style={headerFlexStyle}>
-               <h1 style={{ margin: 0 }}>👥 Manage Users</h1>
+               <h1 style={{ margin: 0 }}>👥 User Management</h1>
             </div>
             <table style={tableStyle}>
               <thead><tr style={{background:'#ddd', textAlign: 'left'}}>
