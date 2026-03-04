@@ -18,6 +18,14 @@ const UserDashboard = () => {
   const [price, setPrice] = useState('');
   const [proofImage, setProofImage] = useState('');
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const getLevelInfo = (pts) => {
     if (pts < 100) return { level: 1, title: '🥉 Price Scout', nextTier: 100 };
     if (pts < 300) return { level: 2, title: '🥈 Market Tracker', nextTier: 300 };
@@ -102,24 +110,25 @@ const UserDashboard = () => {
   if (loading) return <div style={{ textAlign: 'center', marginTop: '50px' }}>Loading your dashboard...</div>;
 
   return (
-    <div style={{ padding: '40px 20px', maxWidth: '1000px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
-      
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-        <h1 style={{ color: '#2c3e50', margin: 0 }}>👋 Hello, {userInfo?.name}</h1>
-        <button onClick={() => setShowModal(true)} style={{ backgroundColor: '#3498db', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem', boxShadow: '0 4px 6px rgba(52, 152, 219, 0.3)' }}>
+    <div style={{ padding: isMobile ? '20px 10px' : '40px 20px', maxWidth: '1000px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
+
+      <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', gap: isMobile ? '15px' : '0', marginBottom: '30px' }}>
+        <h1 style={{ color: '#2c3e50', margin: 0, fontSize: isMobile ? '1.8rem' : '2rem' }}>👋 Hello, {userInfo?.name}</h1>
+        <button onClick={() => setShowModal(true)} style={{ backgroundColor: '#3498db', color: 'white', border: 'none', padding: '12px 24px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem', boxShadow: '0 4px 6px rgba(52, 152, 219, 0.3)', width: isMobile ? '100%' : 'auto', boxSizing: 'border-box' }}>
           + Submit a New Price
         </button>
       </div>
 
-      <div style={{ backgroundColor: 'white', padding: '25px', borderRadius: '15px', boxShadow: '0 8px 20px rgba(0,0,0,0.05)', marginBottom: '40px', border: '1px solid #f1f2f6', display: 'flex', flexDirection: 'column', gap: '15px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ backgroundColor: 'white', padding: isMobile ? '15px' : '25px', borderRadius: '15px', boxShadow: '0 8px 20px rgba(0,0,0,0.05)', marginBottom: '40px', border: '1px solid #f1f2f6', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', gap: isMobile ? '15px' : '0' }}>
           <div>
             <p style={{ margin: 0, color: '#7f8c8d', fontSize: '0.9rem', fontWeight: 'bold', textTransform: 'uppercase' }}>Current Rank</p>
-            <h3 style={{ margin: '5px 0 0 0', color: '#2c3e50', fontSize: '1.5rem' }}>
+            <h3 style={{ margin: '5px 0 0 0', color: '#2c3e50', fontSize: isMobile ? '1.3rem' : '1.5rem' }}>
               Level {levelInfo.level}: {levelInfo.title}
             </h3>
           </div>
-          <div style={{ textAlign: 'right' }}>
+          <div style={{ textAlign: isMobile ? 'left' : 'right' }}>
             <h2 style={{ margin: 0, color: '#f39c12', fontSize: '2.5rem' }}>{points}</h2>
             <p style={{ margin: 0, color: '#7f8c8d', fontSize: '0.9rem', fontWeight: 'bold' }}>Total Points</p>
           </div>
@@ -139,16 +148,16 @@ const UserDashboard = () => {
         </p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? '20px' : '30px' }}>
         
-        <div style={{ backgroundColor: 'white', padding: '25px', borderRadius: '15px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}>
+        <div style={{ backgroundColor: 'white', padding: isMobile ? '15px' : '25px', borderRadius: '15px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}>
           <h3 style={{ borderBottom: '2px solid #ecf0f1', paddingBottom: '10px', marginTop: 0 }}>❤️ My Watchlist</h3>
           {favorites.length === 0 ? (
             <div style={{ textAlign: 'center', color: '#7f8c8d', padding: '20px' }}>Your Watchlist is empty.<br/><br/><Link to="/prices" style={{ color: '#3498db' }}>Browse Prices</Link></div>
           ) : (
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
               {favorites.map(item => (
-                <li key={item._id} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #f1f2f6' }}>
+                <li key={item._id} style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #f1f2f6', gap: isMobile ? '5px' : '0' }}>
                   <span><strong>{item.product?.name}</strong> at {item.shop?.shopName}</span>
                   <span style={{ color: '#27ae60', fontWeight: 'bold' }}>Rs. {item.price}</span>
                 </li>
@@ -157,26 +166,26 @@ const UserDashboard = () => {
           )}
         </div>
 
-        <div style={{ backgroundColor: 'white', padding: '25px', borderRadius: '15px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}>
+        <div style={{ backgroundColor: 'white', padding: isMobile ? '15px' : '25px', borderRadius: '15px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }}>
           <h3 style={{ borderBottom: '2px solid #ecf0f1', paddingBottom: '10px', marginTop: 0 }}>📜 My Submissions</h3>
           {mySubmissions.length === 0 ? (
             <div style={{ textAlign: 'center', color: '#7f8c8d', padding: '20px' }}>You haven't submitted any prices yet!</div>
           ) : (
-            <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+            <div style={{ maxHeight: '300px', overflowY: 'auto', overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
                 <thead>
                   <tr style={{ color: '#7f8c8d', textAlign: 'left', borderBottom: '1px solid #ecf0f1' }}>
-                    <th style={{ padding: '10px 0' }}>Date</th>
-                    <th>Price</th>
-                    <th>Status</th>
+                    <th style={{ padding: '10px 0', whiteSpace: 'nowrap' }}>Date</th>
+                    <th style={{ whiteSpace: 'nowrap' }}>Price</th>
+                    <th style={{ whiteSpace: 'nowrap' }}>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {mySubmissions.map(sub => (
                     <tr key={sub._id} style={{ borderBottom: '1px solid #f9f9f9' }}>
-                      <td style={{ padding: '10px 0' }}>{new Date(sub.createdAt).toLocaleDateString()}</td>
-                      <td><strong>Rs. {sub.price}</strong></td>
-                      <td>
+                      <td style={{ padding: '10px 0', whiteSpace: 'nowrap' }}>{new Date(sub.createdAt).toLocaleDateString()}</td>
+                      <td style={{ whiteSpace: 'nowrap' }}><strong>Rs. {sub.price}</strong></td>
+                      <td style={{ whiteSpace: 'nowrap', paddingRight: '10px' }}>
                         {sub.status === 'approved' && <span style={{ backgroundColor: '#e8f8f5', color: '#27ae60', padding: '3px 8px', borderRadius: '10px', fontSize: '0.8rem', fontWeight: 'bold' }}>Approved (+50)</span>}
                         {sub.status === 'pending' && <span style={{ backgroundColor: '#fef5e7', color: '#f39c12', padding: '3px 8px', borderRadius: '10px', fontSize: '0.8rem', fontWeight: 'bold' }}>Pending</span>}
                         {sub.status === 'rejected' && <span style={{ backgroundColor: '#fadbd8', color: '#e74c3c', padding: '3px 8px', borderRadius: '10px', fontSize: '0.8rem', fontWeight: 'bold' }}>Rejected</span>}
@@ -192,15 +201,15 @@ const UserDashboard = () => {
       </div>
 
       {showModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
-          <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '15px', width: '90%', maxWidth: '400px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}>
-            <h2 style={{ marginTop: 0, color: '#2c3e50' }}>📸 Add a New Price</h2>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px', boxSizing: 'border-box' }}>
+          <div style={{ backgroundColor: 'white', padding: isMobile ? '20px' : '30px', borderRadius: '15px', width: '100%', maxWidth: '400px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', maxHeight: '90vh', overflowY: 'auto', boxSizing: 'border-box' }}>
+            <h2 style={{ marginTop: 0, color: '#2c3e50', fontSize: isMobile ? '1.5rem' : '2rem' }}>📸 Add a New Price</h2>
             <p style={{ color: '#7f8c8d', fontSize: '0.9rem', marginBottom: '20px' }}>Help the community and earn +10 points!</p>
             
             <form onSubmit={handleSubmitPrice} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
               <div>
                 <label style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>Product:</label>
-                <select required value={selectedProduct} onChange={(e) => setSelectedProduct(e.target.value)} style={{ width: '100%', padding: '10px', marginTop: '5px', borderRadius: '5px', border: '1px solid #ccc' }}>
+                <select required value={selectedProduct} onChange={(e) => setSelectedProduct(e.target.value)} style={{ width: '100%', padding: '12px', marginTop: '5px', borderRadius: '5px', border: '1px solid #ccc', boxSizing: 'border-box' }}>
                   <option value="">-- Choose Product --</option>
                   {products.map(p => <option key={p._id} value={p._id}>{p.name}</option>)}
                 </select>
@@ -208,7 +217,7 @@ const UserDashboard = () => {
 
               <div>
                 <label style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>Shop:</label>
-                <select required value={selectedShop} onChange={(e) => setSelectedShop(e.target.value)} style={{ width: '100%', padding: '10px', marginTop: '5px', borderRadius: '5px', border: '1px solid #ccc' }}>
+                <select required value={selectedShop} onChange={(e) => setSelectedShop(e.target.value)} style={{ width: '100%', padding: '12px', marginTop: '5px', borderRadius: '5px', border: '1px solid #ccc', boxSizing: 'border-box' }}>
                   <option value="">-- Choose Shop --</option>
                   {shops.map(s => <option key={s._id} value={s._id}>{s.shopName}</option>)}
                 </select>
@@ -216,7 +225,7 @@ const UserDashboard = () => {
 
               <div>
                 <label style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>Price (Rs):</label>
-                <input type="number" required value={price} onChange={(e) => setPrice(e.target.value)} placeholder="e.g. 150" style={{ width: '100%', padding: '10px', marginTop: '5px', borderRadius: '5px', border: '1px solid #ccc', boxSizing: 'border-box' }} />
+                <input type="number" required value={price} onChange={(e) => setPrice(e.target.value)} placeholder="e.g. 150" style={{ width: '100%', padding: '12px', marginTop: '5px', borderRadius: '5px', border: '1px solid #ccc', boxSizing: 'border-box' }} />
               </div>
 
               <div>
@@ -224,9 +233,9 @@ const UserDashboard = () => {
                 <input type="file" onChange={handleImageUpload} style={{ width: '100%', padding: '10px', marginTop: '5px', border: '1px solid #ccc', borderRadius: '5px', boxSizing: 'border-box' }} />
               </div>
 
-              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                <button type="submit" style={{ flex: 1, padding: '12px', backgroundColor: '#2ecc71', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer' }}>Submit</button>
-                <button type="button" onClick={() => setShowModal(false)} style={{ padding: '12px', backgroundColor: '#95a5a6', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer' }}>Cancel</button>
+              <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '10px', marginTop: '10px' }}>
+                <button type="submit" style={{ flex: 1, padding: '12px', backgroundColor: '#2ecc71', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem' }}>Submit</button>
+                <button type="button" onClick={() => setShowModal(false)} style={{ flex: 1, padding: '12px', backgroundColor: '#95a5a6', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem' }}>Cancel</button>
               </div>
             </form>
           </div>
