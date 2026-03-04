@@ -15,8 +15,16 @@ const ShopOwnerDashboard = () => {
   const [longitude, setLongitude] = useState('');
   const [locationLoading, setLocationLoading] = useState(false);
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '';
@@ -133,101 +141,118 @@ const ShopOwnerDashboard = () => {
   if (!myShop) return <div style={{padding:'50px', textAlign:'center'}}><h2>⏳ Loading your shop...</h2><p>(If this takes too long, you might not have registered a shop yet!)</p><Link to="/register-shop">Register Shop</Link></div>;
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', minHeight: '100vh', fontFamily: 'Arial, sans-serif' }}>
 
-      <div style={{ width: '250px', backgroundColor: '#2c3e50', color: 'white', padding: '20px' }}>
-        <h2 style={{ textAlign: 'center', marginBottom: '30px' }}>🏪 My Shop</h2>
-        <div style={{ marginBottom: '20px', textAlign:'center', fontSize:'0.9rem', color:'#bdc3c7' }}>
-           Hello, {userInfo.name}
-        </div>
-        <nav style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <button onClick={() => setActiveTab('inventory')} style={itemStyle(activeTab === 'inventory')}>📦 My Inventory</button>
-          <button onClick={() => setActiveTab('settings')} style={itemStyle(activeTab === 'settings')}>⚙️ Shop Settings</button>
+      <div style={{ 
+        width: isMobile ? '100%' : '250px', 
+        backgroundColor: '#2c3e50', 
+        color: 'white', 
+        padding: '20px', 
+        display: 'flex', 
+        flexDirection: isMobile ? 'row' : 'column', 
+        justifyContent: isMobile ? 'center' : 'flex-start',
+        overflowX: isMobile ? 'auto' : 'visible',
+        whiteSpace: isMobile ? 'nowrap' : 'normal',
+        borderBottom: isMobile ? '2px solid #34495e' : 'none',
+        boxSizing: 'border-box'
+      }}>
+        {!isMobile && (
+          <>
+            <h2 style={{ textAlign: 'center', marginBottom: '10px' }}>🏪 My Shop</h2>
+            <div style={{ marginBottom: '30px', textAlign:'center', fontSize:'0.9rem', color:'#bdc3c7' }}>
+              Hello, {userInfo.name}
+            </div>
+          </>
+        )}
+        <nav style={{ display: 'flex', flexDirection: isMobile ? 'row' : 'column', gap: '10px', width: isMobile ? 'auto' : '100%' }}>
+          <button onClick={() => setActiveTab('inventory')} style={itemStyle(activeTab === 'inventory', isMobile)}>📦 My Inventory</button>
+          <button onClick={() => setActiveTab('settings')} style={itemStyle(activeTab === 'settings', isMobile)}>⚙️ Shop Settings</button>
         </nav>
       </div>
 
-      <div style={{ flex: 1, padding: '40px', backgroundColor: '#f4f6f7' }}>
+      <div style={{ flex: 1, padding: isMobile ? '15px' : '40px', backgroundColor: '#f4f6f7', overflowY: 'auto', maxWidth: '100vw', boxSizing: 'border-box' }}>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', gap: isMobile ? '15px' : '0', marginBottom: '30px' }}>
           <div>
-            <h1 style={{ margin: 0 }}>{myShop.shopName}</h1>
-            <p style={{ color: '#7f8c8d' }}>📍 {myShop.address} | 📞 {myShop.phoneNumber}</p>
+            <h1 style={{ margin: 0, fontSize: isMobile ? '1.8rem' : '2em' }}>{myShop.shopName}</h1>
+            <p style={{ color: '#7f8c8d', margin: '5px 0' }}>📍 {myShop.address} | 📞 {myShop.phoneNumber}</p>
             <div style={{marginTop:'5px'}}>
                Status: {myShop.status === 'approved' ? <span style={{color:'green', fontWeight:'bold'}}>✅ Approved</span> : <span style={{color:'orange', fontWeight:'bold'}}>⏳ Pending Admin Approval</span>}
             </div>
           </div>
-          <Link to="/add-price" style={{ backgroundColor: '#2ecc71', color: 'white', padding: '10px 20px', textDecoration: 'none', borderRadius: '5px', fontWeight: 'bold' }}>
+          <Link to="/add-price" style={{ backgroundColor: '#2ecc71', color: 'white', padding: '10px 20px', textDecoration: 'none', borderRadius: '5px', fontWeight: 'bold', width: isMobile ? '100%' : 'auto', textAlign: 'center', boxSizing: 'border-box' }}>
             + Add New Item
           </Link>
         </div>
 
         {activeTab === 'inventory' && (
-          <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
+          <div style={{ backgroundColor: 'white', padding: isMobile ? '15px' : '20px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }}>
             <h3>📦 Current Listings</h3>
             {myPrices.length === 0 ? <p>You haven't added any items yet.</p> : (
-              <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
-                <thead>
-                  <tr style={{ backgroundColor: '#ecf0f1', textAlign: 'left' }}>
-                    <th style={{ padding: '10px' }}>Product</th>
-                    <th style={{ padding: '10px' }}>Your Price</th>
-                    <th style={{ padding: '10px' }}>Status</th>
-                    <th style={{ padding: '10px' }}>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {myPrices.map((price) => (
-                    <tr key={price._id} style={{ borderBottom: '1px solid #eee' }}>
-                      <td style={{ padding: '10px', display:'flex', alignItems:'center', gap:'10px' }}>
-                         <img 
-                            src={getImageUrl(price.product?.image) || 'https://placehold.co/40'} 
-                            alt={price.product?.name || "Product"} 
-                            style={{width:'40px', height:'40px', borderRadius:'5px', objectFit: 'cover'}}
-                          />
-                      </td>
-                      <td style={{ padding: '10px', fontWeight: 'bold', color: 'green' }}>Rs. {price.price}</td>
-                      <td style={{ padding: '10px' }}>
-                        {price.status === 'approved' ? '✅ Live' : '⏳ Review'}
-                      </td>
-
-                      <td>
-                        <button 
-                          onClick={() => handleToggleStock(price._id)} 
-                          style={{ 
-                            backgroundColor: price.inStock === false ? '#27ae60' : '#f39c12', 
-                            color: 'white', 
-                            border: 'none', 
-                            padding: '6px 12px', 
-                            borderRadius: '5px', 
-                            marginRight: '10px', 
-                            cursor: 'pointer',
-                            fontWeight: 'bold'
-                          }}
-                        >
-                          {price.inStock === false ? '📦 Mark In Stock' : '🚫 Mark Out of Stock'}
-                        </button>
-
-                        <button 
-                          onClick={() => handleDeletePrice(price._id)} 
-                          style={{ backgroundColor: '#e74c3c', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '5px', cursor: 'pointer' }}
-                        >
-                          Delete
-                        </button>
-                      </td>
+              <div style={{ overflowX: 'auto', borderRadius: '8px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '10px' }}>
+                  <thead>
+                    <tr style={{ backgroundColor: '#ecf0f1', textAlign: 'left' }}>
+                      <th style={{ padding: '10px', whiteSpace: 'nowrap' }}>Product</th>
+                      <th style={{ padding: '10px', whiteSpace: 'nowrap' }}>Your Price</th>
+                      <th style={{ padding: '10px', whiteSpace: 'nowrap' }}>Status</th>
+                      <th style={{ padding: '10px', whiteSpace: 'nowrap' }}>Action</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {myPrices.map((price) => (
+                      <tr key={price._id} style={{ borderBottom: '1px solid #eee' }}>
+                        <td style={{ padding: '10px', display:'flex', alignItems:'center', gap:'10px', whiteSpace: 'nowrap' }}>
+                           <img 
+                              src={getImageUrl(price.product?.image) || 'https://placehold.co/40'} 
+                              alt={price.product?.name || "Product"} 
+                              style={{width:'40px', height:'40px', borderRadius:'5px', objectFit: 'cover'}}
+                            />
+                        </td>
+                        <td style={{ padding: '10px', fontWeight: 'bold', color: 'green', whiteSpace: 'nowrap' }}>Rs. {price.price}</td>
+                        <td style={{ padding: '10px', whiteSpace: 'nowrap' }}>
+                          {price.status === 'approved' ? '✅ Live' : '⏳ Review'}
+                        </td>
+                        <td style={{ padding: '10px', whiteSpace: 'nowrap' }}>
+                          <div style={{ display: 'flex', gap: '5px', flexWrap: isMobile ? 'wrap' : 'nowrap' }}>
+                            <button 
+                              onClick={() => handleToggleStock(price._id)} 
+                              style={{ 
+                                backgroundColor: price.inStock === false ? '#27ae60' : '#f39c12', 
+                                color: 'white', 
+                                border: 'none', 
+                                padding: '6px 12px', 
+                                borderRadius: '5px', 
+                                cursor: 'pointer',
+                                fontWeight: 'bold'
+                              }}
+                            >
+                              {price.inStock === false ? '📦 Mark In Stock' : '🚫 Mark Out of Stock'}
+                            </button>
+                            <button 
+                              onClick={() => handleDeletePrice(price._id)} 
+                              style={{ backgroundColor: '#e74c3c', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '5px', cursor: 'pointer' }}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             )}
           </div>
         )}
 
         {activeTab === 'settings' && (
-          <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', maxWidth: '500px' }}>
+          <div style={{ backgroundColor: 'white', padding: isMobile ? '20px' : '30px', borderRadius: '10px', boxShadow: '0 2px 10px rgba(0,0,0,0.05)', maxWidth: '500px', width: '100%', boxSizing: 'border-box' }}>
             <h3>⚙️ Edit Shop Details</h3>
             <form onSubmit={handleUpdateShop} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
               
               <label>Shop Name</label>
-              <input type="text" value={shopName} onChange={(e) => setShopName(e.target.value)} style={{ padding: '10px', border: '1px solid #bdc3c7', borderRadius: '5px' }} />
+              <input type="text" value={shopName} onChange={(e) => setShopName(e.target.value)} style={{ padding: '10px', border: '1px solid #bdc3c7', borderRadius: '5px', boxSizing: 'border-box' }} />
 
               <label>Address</label>
               <input 
@@ -235,21 +260,22 @@ const ShopOwnerDashboard = () => {
                 placeholder="e.g., 123 Main Street, City Name, Province" 
                 value={address} 
                 onChange={(e) => setAddress(e.target.value)} 
-                style={{ padding: '10px', border: '1px solid #bdc3c7', borderRadius: '5px' }} 
+                style={{ padding: '10px', border: '1px solid #bdc3c7', borderRadius: '5px', boxSizing: 'border-box' }} 
               />
 
               <label>Phone Number</label>
-              <input type="text" value={phoneNumber} onChange={(e) => setPhone(e.target.value)} style={{ padding: '10px', border: '1px solid #bdc3c7', borderRadius: '5px' }} />
+              <input type="text" value={phoneNumber} onChange={(e) => setPhone(e.target.value)} style={{ padding: '10px', border: '1px solid #bdc3c7', borderRadius: '5px', boxSizing: 'border-box' }} />
 
               <div style={{ backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '5px', border: '1px solid #dfe6e9' }}>
                 <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '10px' }}>Shop Location (GPS):</label>
                 
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '10px' }}>
-                  <input type="text" placeholder="Latitude" value={latitude} disabled style={{ flex: 1, padding: '10px', border: '1px solid #bdc3c7', backgroundColor: '#ecf0f1', borderRadius: '5px' }} />
-                  <input type="text" placeholder="Longitude" value={longitude} disabled style={{ flex: 1, padding: '10px', border: '1px solid #bdc3c7', backgroundColor: '#ecf0f1', borderRadius: '5px' }} />
+                {/* 👇 NEW: Stack GPS inputs on mobile */}
+                <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '10px', marginBottom: '10px' }}>
+                  <input type="text" placeholder="Latitude" value={latitude} disabled style={{ flex: 1, padding: '10px', border: '1px solid #bdc3c7', backgroundColor: '#ecf0f1', borderRadius: '5px', boxSizing: 'border-box' }} />
+                  <input type="text" placeholder="Longitude" value={longitude} disabled style={{ flex: 1, padding: '10px', border: '1px solid #bdc3c7', backgroundColor: '#ecf0f1', borderRadius: '5px', boxSizing: 'border-box' }} />
                 </div>
 
-                <div style={{ display: 'flex', gap: '10px' }}>
+                <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '10px' }}>
                   <button 
                     type="button" 
                     onClick={handleGetLocation} 
@@ -274,7 +300,7 @@ const ShopOwnerDashboard = () => {
                 </p>
               </div>
               
-              <button type="submit" style={{ backgroundColor: '#3498db', color: 'white', padding: '10px', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
+              <button type="submit" style={{ backgroundColor: '#3498db', color: 'white', padding: '10px', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', fontSize: '1rem' }}>
                 Save Changes
               </button>
             </form>
@@ -286,16 +312,20 @@ const ShopOwnerDashboard = () => {
   );
 };
 
-const itemStyle = (active) => ({
+const itemStyle = (active, isMobile) => ({
   padding: '15px', 
   cursor: 'pointer', 
   background: active ? '#34495e' : 'transparent', 
   border: 'none', 
   color: 'white', 
-  textAlign: 'left', 
+  textAlign: isMobile ? 'center' : 'left', 
   fontSize: '1rem',
-  borderLeft: active ? '5px solid #2ecc71' : '5px solid transparent',
-  width: '100%'
+  borderLeft: (!isMobile && active) ? '5px solid #2ecc71' : '5px solid transparent',
+  borderBottom: (isMobile && active) ? '5px solid #2ecc71' : '5px solid transparent',
+  width: isMobile ? 'auto' : '100%',
+  transition: '0.2s',
+  whiteSpace: 'nowrap',
+  borderRadius: isMobile ? '5px' : '0'
 });
 
 export default ShopOwnerDashboard;

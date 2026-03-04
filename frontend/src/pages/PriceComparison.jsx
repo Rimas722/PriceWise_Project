@@ -22,8 +22,16 @@ const PriceComparison = () => {
   const [reportImage, setReportImage] = useState('');
   const [uploadingReport, setUploadingReport] = useState(false);
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
   const navigate = useNavigate();
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const getBadge = (pts) => {
     if (!pts && pts !== 0) return '';
@@ -95,7 +103,6 @@ const PriceComparison = () => {
   const clearLocationFilter = () => {
       setUserLocation(null);
   };
-
 
   const handleSave = async (priceId) => {
     if (!userInfo) {
@@ -258,22 +265,22 @@ const PriceComparison = () => {
   if (loading) return <div style={{textAlign: 'center', marginTop: '50px', fontSize: '1.2rem'}}>⏳ Loading latest prices...</div>;
 
   return (
-    <div style={{ backgroundColor: '#f4f6f7', minHeight: '100vh', padding: '40px 20px', fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ backgroundColor: '#f4f6f7', minHeight: '100vh', padding: isMobile ? '20px 10px' : '40px 20px', fontFamily: 'Arial, sans-serif' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
 
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h1 style={{ color: '#2c3e50', fontSize: '2.5rem', marginBottom: '10px' }}>💰 Live Market Prices</h1>
+        <div style={{ textAlign: 'center', marginBottom: isMobile ? '20px' : '40px' }}>
+          <h1 style={{ color: '#2c3e50', fontSize: isMobile ? '2rem' : '2.5rem', marginBottom: '10px' }}>💰 Live Market Prices</h1>
           <p style={{ color: '#7f8c8d', fontSize: '1.1rem' }}>Find the best deals in your city today.</p>
         </div>
 
-        <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                <span style={{ fontWeight: 'bold', color: '#34495e' }}>🌍 Find deals near me:</span>
+        <div style={{ backgroundColor: 'white', padding: isMobile ? '15px' : '20px', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', marginBottom: '20px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '15px' }}>
+            <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: 'center', gap: '15px', width: '100%', justifyContent: 'center' }}>
+                <span style={{ fontWeight: 'bold', color: '#34495e', textAlign: 'center' }}>🌍 Find deals near me:</span>
                 
                 <select 
                     value={maxDistance} 
                     onChange={(e) => setMaxDistance(Number(e.target.value))}
-                    style={{ padding: '8px', borderRadius: '5px', border: '1px solid #ccc' }}
+                    style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc', width: isMobile ? '100%' : 'auto' }}
                 >
                     <option value={2}>Within 2 km</option>
                     <option value={5}>Within 5 km</option>
@@ -285,30 +292,30 @@ const PriceComparison = () => {
                    <button 
                        onClick={handleFindMyArea}
                        disabled={findingLocation}
-                       style={{ padding: '10px 20px', backgroundColor: '#3498db', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}
+                       style={{ padding: '12px 20px', backgroundColor: '#3498db', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', width: isMobile ? '100%' : 'auto' }}
                    >
                        {findingLocation ? '⏳ Locating...' : '📍 Use My Location'}
                    </button>
                 ) : (
                     <button 
                        onClick={clearLocationFilter}
-                       style={{ padding: '10px 20px', backgroundColor: '#e74c3c', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold' }}
+                       style={{ padding: '12px 20px', backgroundColor: '#e74c3c', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', width: isMobile ? '100%' : 'auto' }}
                    >
                        ❌ Clear Location Filter
                    </button>
                 )}
             </div>
-            {locationError && <span style={{ color: '#e74c3c', fontSize: '0.9rem' }}>{locationError}</span>}
-            {userLocation && <span style={{ color: '#27ae60', fontSize: '0.9rem', fontWeight: 'bold' }}>✅ Showing results within {maxDistance}km of your location.</span>}
+            {locationError && <span style={{ color: '#e74c3c', fontSize: '0.9rem', textAlign: 'center' }}>{locationError}</span>}
+            {userLocation && <span style={{ color: '#27ae60', fontSize: '0.9rem', fontWeight: 'bold', textAlign: 'center' }}>✅ Showing results within {maxDistance}km of your location.</span>}
         </div>
 
-        <div style={filterContainerStyle}>
+        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '15px', backgroundColor: 'white', padding: isMobile ? '15px' : '20px', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', justifyContent: 'center' }}>
           <input 
             type="text" 
             placeholder="🔍 Search for Rice, Sugar, Milk..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={searchInputStyle}
+            style={{ flex: isMobile ? 'none' : '1', minWidth: isMobile ? '100%' : '250px', padding: '12px 20px', borderRadius: '8px', border: '1px solid #dfe6e9', fontSize: '1rem', outline: 'none', boxSizing: 'border-box' }}
           />
 
           <select 
@@ -317,7 +324,7 @@ const PriceComparison = () => {
               setSelectedCategory(e.target.value);
               setSelectedSubCategory(''); 
             }}
-            style={dropdownStyle}
+            style={{ padding: '12px 20px', borderRadius: '8px', border: '1px solid #dfe6e9', fontSize: '1rem', backgroundColor: 'white', cursor: 'pointer', outline: 'none', width: isMobile ? '100%' : 'auto', boxSizing: 'border-box' }}
           >
             <option value="">🛒 All Categories</option>
             {categories.map(c => (
@@ -329,7 +336,7 @@ const PriceComparison = () => {
             <select 
               value={selectedSubCategory} 
               onChange={(e) => setSelectedSubCategory(e.target.value)} 
-              style={{ ...dropdownStyle, borderColor: '#3498db', backgroundColor: '#ebf5fb', color: '#2980b9', fontWeight: 'bold' }}
+              style={{ padding: '12px 20px', borderRadius: '8px', border: '1px solid #3498db', fontSize: '1rem', backgroundColor: '#ebf5fb', color: '#2980b9', fontWeight: 'bold', cursor: 'pointer', outline: 'none', width: isMobile ? '100%' : 'auto', boxSizing: 'border-box' }}
             >
               <option value="">📂 All in {selectedCategory}</option>
               {availableSubCategories.map(subCat => (
@@ -341,7 +348,7 @@ const PriceComparison = () => {
           <select 
             value={sortOption} 
             onChange={(e) => setSortOption(e.target.value)}
-            style={dropdownStyle}
+            style={{ padding: '12px 20px', borderRadius: '8px', border: '1px solid #dfe6e9', fontSize: '1rem', backgroundColor: 'white', cursor: 'pointer', outline: 'none', width: isMobile ? '100%' : 'auto', boxSizing: 'border-box' }}
           >
             <option value="cheapest">📉 Cheapest First</option>
             <option value="expensive">📈 Most Expensive</option>
@@ -350,11 +357,11 @@ const PriceComparison = () => {
         </div>
 
         {filteredPrices.length === 0 ? (
-          <div style={{ textAlign: 'center', marginTop: '50px', color: '#7f8c8d', fontSize: '1.2rem' }}>
+          <div style={{ textAlign: 'center', marginTop: '50px', color: '#7f8c8d', fontSize: '1.2rem', padding: '0 20px' }}>
             No products found matching your search. Try expanding your search area or clearing filters.
           </div>
         ) : (
-          <div style={gridStyle}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(auto-fill, minmax(280px, 1fr))', gap: isMobile ? '20px' : '25px', marginTop: '30px' }}>
             {filteredPrices.map((item) => (
               <div key={item._id} style={cardStyle}>
                 
@@ -390,7 +397,7 @@ const PriceComparison = () => {
                   </div>
 
                   {item.submittedBy && (
-                    <div style={{ fontSize: '0.8rem', color: '#95a5a6', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <div style={{ fontSize: '0.8rem', color: '#95a5a6', marginBottom: '10px', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '5px' }}>
                       👤 Spotted by: 
                       <span style={{ fontWeight: 'bold', color: '#2c3e50' }}>
                         {item.submittedBy.name}
@@ -411,14 +418,14 @@ const PriceComparison = () => {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', justifyContent: 'space-around', padding: '15px', borderTop: '1px solid #f1f2f6' }}>
-                  <button onClick={() => handleSave(item._id)} style={actionBtnStyle}>
+                <div style={{ display: 'flex', justifyContent: 'space-around', padding: '10px', borderTop: '1px solid #f1f2f6', flexWrap: isMobile ? 'wrap' : 'nowrap' }}>
+                  <button onClick={() => handleSave(item._id)} style={{ ...actionBtnStyle, padding: isMobile ? '8px' : '12px' }}>
                     ❤️ Save
                   </button>
-                  <button onClick={() => handleUpvote(item._id)} style={{...actionBtnStyle, color: '#27ae60'}}>
-                    👍 Helpful ({item.helpfulVotes?.length || 0})
+                  <button onClick={() => handleUpvote(item._id)} style={{...actionBtnStyle, color: '#27ae60', padding: isMobile ? '8px' : '12px'}}>
+                    👍 ({item.helpfulVotes?.length || 0})
                   </button>
-                  <button onClick={() => openReportModal(item._id)} style={{...actionBtnStyle, color: '#e74c3c'}}>
+                  <button onClick={() => openReportModal(item._id)} style={{...actionBtnStyle, color: '#e74c3c', borderRight: 'none', padding: isMobile ? '8px' : '12px'}}>
                     🚩 Report
                   </button>
                 </div>
@@ -427,13 +434,13 @@ const PriceComparison = () => {
                   <div style={{ display: 'flex', width: '100%', borderTop: '1px solid #f1f2f6' }}>
                     <button 
                       onClick={() => handleToggleStock(item._id)} 
-                      style={{ flex: 1, padding: '12px', color: 'white', backgroundColor: item.inStock === false ? '#27ae60' : '#f39c12', border: 'none', fontWeight: 'bold', cursor: 'pointer', borderBottomLeftRadius: '10px' }}
+                      style={{ flex: 1, padding: '12px', color: 'white', backgroundColor: item.inStock === false ? '#27ae60' : '#f39c12', border: 'none', fontWeight: 'bold', cursor: 'pointer', borderBottomLeftRadius: '10px', fontSize: isMobile ? '0.8rem' : '1rem' }}
                     >
-                      {item.inStock === false ? '📦 Mark In Stock' : '🚫 Mark Out of Stock'}
+                      {item.inStock === false ? '📦 In Stock' : '🚫 Out of Stock'}
                     </button>
                     <button 
                       onClick={() => handleDeletePrice(item._id)} 
-                      style={{ flex: 1, padding: '12px', color: 'white', backgroundColor: '#c0392b', border: 'none', fontWeight: 'bold', cursor: 'pointer', borderLeft: '1px solid white', borderBottomRightRadius: '10px' }}
+                      style={{ flex: 1, padding: '12px', color: 'white', backgroundColor: '#c0392b', border: 'none', fontWeight: 'bold', cursor: 'pointer', borderLeft: '1px solid white', borderBottomRightRadius: '10px', fontSize: isMobile ? '0.8rem' : '1rem' }}
                     >
                       🗑️ Delete
                     </button>
@@ -448,9 +455,9 @@ const PriceComparison = () => {
       </div>
 
       {showReportModal && (
-        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 }}>
-          <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '10px', width: '90%', maxWidth: '400px', boxShadow: '0 5px 15px rgba(0,0,0,0.3)' }}>
-            <h2 style={{ marginTop: 0, color: '#d63031' }}>🚩 Report Price</h2>
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px', boxSizing: 'border-box' }}>
+          <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '10px', width: '100%', maxWidth: '400px', boxShadow: '0 5px 15px rgba(0,0,0,0.3)', maxHeight: '90vh', overflowY: 'auto', boxSizing: 'border-box' }}>
+            <h2 style={{ marginTop: 0, color: '#d63031', fontSize: isMobile ? '1.5rem' : '2rem' }}>🚩 Report Price</h2>
             <p style={{ color: '#7f8c8d', fontSize: '0.9rem', marginBottom: '20px' }}>
               Help keep our community accurate. Tell us what is wrong with this listing.
             </p>
@@ -463,7 +470,7 @@ const PriceComparison = () => {
                   required 
                   value={reportReason} 
                   onChange={(e) => setReportReason(e.target.value)} 
-                  style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ccc', boxSizing: 'border-box' }}
+                  style={{ width: '100%', padding: '12px', borderRadius: '5px', border: '1px solid #ccc', boxSizing: 'border-box', fontSize: '1rem' }}
                 >
                   <option value="">-- Select a reason --</option>
                   <option value="Fake / Incorrect Price">Fake / Incorrect Price</option>
@@ -480,11 +487,11 @@ const PriceComparison = () => {
                 {reportImage && <span style={{ color: '#27ae60', fontSize: '0.9rem', display: 'block', marginTop: '5px', fontWeight: 'bold' }}>✅ Image attached successfully</span>}
               </div>
 
-              <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                <button type="submit" style={{ flex: 1, padding: '12px', backgroundColor: '#d63031', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer' }}>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexDirection: isMobile ? 'column' : 'row' }}>
+                <button type="submit" style={{ flex: 1, padding: '12px', backgroundColor: '#d63031', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem' }}>
                   Submit Report
                 </button>
-                <button type="button" onClick={() => setShowReportModal(false)} style={{ padding: '12px', backgroundColor: '#95a5a6', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer' }}>
+                <button type="button" onClick={() => setShowReportModal(false)} style={{ flex: 1, padding: '12px', backgroundColor: '#95a5a6', color: 'white', border: 'none', borderRadius: '5px', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem' }}>
                   Cancel
                 </button>
               </div>
@@ -497,13 +504,9 @@ const PriceComparison = () => {
   );
 };
 
-const filterContainerStyle = { display: 'flex', gap: '15px', backgroundColor: 'white', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 10px rgba(0,0,0,0.05)', flexWrap: 'wrap', justifyContent: 'center' };
-const searchInputStyle = { flex: '1', minWidth: '250px', padding: '12px 20px', borderRadius: '8px', border: '1px solid #dfe6e9', fontSize: '1rem', outline: 'none' };
-const dropdownStyle = { padding: '12px 20px', borderRadius: '8px', border: '1px solid #dfe6e9', fontSize: '1rem', backgroundColor: 'white', cursor: 'pointer', outline: 'none' };
-const gridStyle = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '25px', marginTop: '40px' };
 const cardStyle = { backgroundColor: 'white', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 6px 15px rgba(0,0,0,0.08)', display: 'flex', flexDirection: 'column', border: '1px solid #f1f2f6' };
 const imageStyle = { width: '100%', height: '200px', objectFit: 'cover', borderBottom: '1px solid #f1f2f6' };
 const categoryBadgeStyle = { position: 'absolute', top: '10px', right: '10px', backgroundColor: 'rgba(44, 62, 80, 0.9)', color: 'white', padding: '5px 10px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 'bold' };
-const actionBtnStyle = { flex: 1, padding: '12px', border: 'none', backgroundColor: 'transparent', cursor: 'pointer', fontWeight: 'bold', color: '#34495e', fontSize: '0.9rem', transition: '0.2s', borderRight: '1px solid #f1f2f6' };
+const actionBtnStyle = { flex: 1, border: 'none', backgroundColor: 'transparent', cursor: 'pointer', fontWeight: 'bold', color: '#34495e', fontSize: '0.9rem', transition: '0.2s', borderRight: '1px solid #f1f2f6' };
 
 export default PriceComparison;
