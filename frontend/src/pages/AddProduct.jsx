@@ -16,7 +16,7 @@ const AddProduct = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/categories');
+        const { data } = await axios.get('https://pricewise-project.onrender.com/api/categories');
         setCategories(data);
       } catch (error) {
         console.error('Error fetching categories', error);
@@ -38,7 +38,7 @@ const AddProduct = () => {
         },
       };
 
-      const { data } = await axios.post('http://localhost:5000/api/upload', formData, config);
+      const { data } = await axios.post('https://pricewise-project.onrender.com/api/upload', formData, config);
       
       setImage(data);
       setUploading(false);
@@ -64,7 +64,7 @@ const AddProduct = () => {
       const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
 
       await axios.post(
-        'http://localhost:5000/api/products',
+        'https://pricewise-project.onrender.com/api/products',
         { 
           name, 
           category, 

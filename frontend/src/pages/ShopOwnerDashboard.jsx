@@ -21,12 +21,12 @@ const ShopOwnerDashboard = () => {
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '';
     if (imagePath.startsWith('http')) return imagePath;
-    return `http://localhost:5000${imagePath}`; 
+    return `https://pricewise-project.onrender.com${imagePath}`; 
   };
 
   const fetchData = async () => {
     try {
-      const shopRes = await axios.get('http://localhost:5000/api/shops/myshop', config);
+      const shopRes = await axios.get('https://pricewise-project.onrender.com/api/shops/myshop', config);
       setMyShop(shopRes.data);
       setShopName(shopRes.data.shopName);
       setAddress(shopRes.data.address);
@@ -34,7 +34,7 @@ const ShopOwnerDashboard = () => {
       setLatitude(shopRes.data.latitude || ''); 
       setLongitude(shopRes.data.longitude || '');
 
-      const priceRes = await axios.get('http://localhost:5000/api/prices/my-prices', config);
+      const priceRes = await axios.get('https://pricewise-project.onrender.com/api/prices/my-prices', config);
       setMyPrices(priceRes.data);
 
     } catch (error) {
@@ -49,7 +49,7 @@ const ShopOwnerDashboard = () => {
   const handleUpdateShop = async (e) => {
     e.preventDefault();
     try {
-      await axios.put('http://localhost:5000/api/shops/myshop', {
+      await axios.put('https://pricewise-project.onrender.com/api/shops/myshop', {
         shopName, address, phoneNumber,
         latitude, longitude
       }, config);
@@ -111,7 +111,7 @@ const ShopOwnerDashboard = () => {
   const handleDeletePrice = async (id) => {
     if (window.confirm('Remove this item from your shop?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/prices/${id}`, config);
+        await axios.delete(`https://pricewise-project.onrender.com/api/prices/${id}`, config);
         fetchData(); 
       } catch (error) {
         alert('Error deleting item');
@@ -122,7 +122,7 @@ const ShopOwnerDashboard = () => {
   const handleToggleStock = async (priceId) => {
     try {
       const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
-      await axios.put(`http://localhost:5000/api/prices/${priceId}/stock`, {}, config);
+      await axios.put(`https://pricewise-project.onrender.com/api/prices/${priceId}/stock`, {}, config);
       
       window.location.reload(); 
     } catch (error) {
@@ -237,7 +237,7 @@ const ShopOwnerDashboard = () => {
                 onChange={(e) => setAddress(e.target.value)} 
                 style={{ padding: '10px', border: '1px solid #bdc3c7', borderRadius: '5px' }} 
               />
-              
+
               <label>Phone Number</label>
               <input type="text" value={phoneNumber} onChange={(e) => setPhone(e.target.value)} style={{ padding: '10px', border: '1px solid #bdc3c7', borderRadius: '5px' }} />
 

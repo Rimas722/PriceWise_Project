@@ -20,7 +20,7 @@ const Register = () => {
       };
 
       const { data } = await axios.post(
-        'http://localhost:5000/api/users',
+        'https://pricewise-project.onrender.com/api/users',
         { name, email, password, role },
         config
       );

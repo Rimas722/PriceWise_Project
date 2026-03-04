@@ -37,8 +37,8 @@ const PriceComparison = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const priceRes = await axios.get('http://localhost:5000/api/prices');
-        const catRes = await axios.get('http://localhost:5000/api/categories');
+        const priceRes = await axios.get('https://pricewise-project.onrender.com/api/prices');
+        const catRes = await axios.get('https://pricewise-project.onrender.com/api/categories');
         
         setPrices(priceRes.data);
         setCategories(catRes.data);
@@ -106,7 +106,7 @@ const PriceComparison = () => {
     
     try {
       const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
-      await axios.post('http://localhost:5000/api/users/favorites', { priceId }, config);
+      await axios.post('https://pricewise-project.onrender.com/api/users/favorites', { priceId }, config);
       alert('❤️ Saved to your Watchlist!');
     } catch (error) {
       alert(error.response?.data?.message || 'Error saving item.');
@@ -121,7 +121,7 @@ const PriceComparison = () => {
     
     try {
       const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
-      await axios.put(`http://localhost:5000/api/prices/${priceId}/upvote`, {}, config);
+      await axios.put(`https://pricewise-project.onrender.com/api/prices/${priceId}/upvote`, {}, config);
       
       alert('👍 You marked this as helpful! The submitter earned +2 points.');
       
@@ -134,7 +134,7 @@ const PriceComparison = () => {
   const handleToggleStock = async (priceId) => {
     try {
       const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
-      await axios.put(`http://localhost:5000/api/prices/${priceId}/stock`, {}, config);
+      await axios.put(`https://pricewise-project.onrender.com/api/prices/${priceId}/stock`, {}, config);
       
       window.location.reload(); 
     } catch (error) {
@@ -158,7 +158,7 @@ const PriceComparison = () => {
     formData.append('image', file);
     setUploadingReport(true);
     try {
-      const { data } = await axios.post('http://localhost:5000/api/upload', formData, {
+      const { data } = await axios.post('https://pricewise-project.onrender.com/api/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setReportImage(data);
@@ -173,7 +173,7 @@ const PriceComparison = () => {
     e.preventDefault();
     try {
       const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
-      await axios.post('http://localhost:5000/api/reports', { 
+      await axios.post('https://pricewise-project.onrender.com/api/reports', { 
         priceId: reportPriceId, 
         reason: reportReason,
         proofImage: reportImage 
@@ -196,7 +196,7 @@ const PriceComparison = () => {
         const userInfo = JSON.parse(localStorage.getItem('userInfo'));
         const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
 
-        await axios.delete(`http://localhost:5000/api/prices/${priceId}`, config);
+        await axios.delete(`https://pricewise-project.onrender.com/api/prices/${priceId}`, config);
 
         setPrices(prices.filter(p => p._id !== priceId));
         alert("Price deleted successfully.");
@@ -252,7 +252,7 @@ const PriceComparison = () => {
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '';
-    return imagePath.startsWith('http') ? imagePath : `http://localhost:5000${imagePath}`;
+    return imagePath.startsWith('http') ? imagePath : `https://pricewise-project.onrender.com${imagePath}`;
   };
 
   if (loading) return <div style={{textAlign: 'center', marginTop: '50px', fontSize: '1.2rem'}}>⏳ Loading latest prices...</div>;

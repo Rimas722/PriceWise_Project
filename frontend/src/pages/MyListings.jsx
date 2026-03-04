@@ -12,7 +12,7 @@ const MyListings = () => {
       };
 
       try {
-        const { data } = await axios.get('http://localhost:5000/api/prices/my-prices', config);
+        const { data } = await axios.get('https://pricewise-project.onrender.com/api/prices/my-prices', config);
         setPrices(data);
       } catch (error) {
         console.error(error);
@@ -30,7 +30,7 @@ const MyListings = () => {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         };
 
-        await axios.delete(`http://localhost:5000/api/prices/${id}`, config);
+        await axios.delete(`https://pricewise-project.onrender.com/api/prices/${id}`, config);
 
         setPrices(prices.filter((price) => price._id !== id));
         alert('Price Deleted!');

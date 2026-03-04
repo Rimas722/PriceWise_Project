@@ -11,7 +11,7 @@ const ShopProfile = () => {
   useEffect(() => {
     const fetchShopData = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/shops/${id}`);
+        const { data } = await axios.get(`https://pricewise-project.onrender.com/api/shops/${id}`);
         setShop(data.shop);
         setPrices(data.prices);
         setLoading(false);

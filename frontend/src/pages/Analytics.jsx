@@ -12,7 +12,7 @@ const Analytics = () => {
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/prices');
+        const { data } = await axios.get('https://pricewise-project.onrender.com/api/prices');
         const approvedPrices = data.filter(p => p.status === 'approved' && p.product);
         setPrices(approvedPrices);
         setLoading(false);

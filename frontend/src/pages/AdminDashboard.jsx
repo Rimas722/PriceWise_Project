@@ -30,12 +30,12 @@ const AdminDashboard = () => {
 
   const fetchAll = async () => {
     try {
-      const prodRes = await axios.get('http://localhost:5000/api/products');
-      const catRes = await axios.get('http://localhost:5000/api/categories');
-      const priceRes = await axios.get('http://localhost:5000/api/prices/all', config);
-      const shopRes = await axios.get('http://localhost:5000/api/shops/all', config);
-      const reportRes = await axios.get('http://localhost:5000/api/reports', config);
-      const userRes = await axios.get('http://localhost:5000/api/users', config); 
+      const prodRes = await axios.get('https://pricewise-project.onrender.com/api/products');
+      const catRes = await axios.get('https://pricewise-project.onrender.com/api/categories');
+      const priceRes = await axios.get('https://pricewise-project.onrender.com/api/prices/all', config);
+      const shopRes = await axios.get('https://pricewise-project.onrender.com/api/shops/all', config);
+      const reportRes = await axios.get('https://pricewise-project.onrender.com/api/reports', config);
+      const userRes = await axios.get('https://pricewise-project.onrender.com/api/users', config); 
       
       setProducts(prodRes.data);
       setCategories(catRes.data);
@@ -53,7 +53,7 @@ const AdminDashboard = () => {
   const handleDeleteUser = async (id) => {
     if (window.confirm('🚨 WARNING: Are you sure you want to permanently delete this user?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/users/${id}`, config);
+        await axios.delete(`https://pricewise-project.onrender.com/api/users/${id}`, config);
         alert('User Deleted Successfully');
         fetchAll();
       } catch (error) {
@@ -68,7 +68,7 @@ const AdminDashboard = () => {
     formData.append('image', file);
     setUploading(true);
     try {
-      const { data } = await axios.post('http://localhost:5000/api/upload', formData, {
+      const { data } = await axios.post('https://pricewise-project.onrender.com/api/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setNewImage(data);
@@ -81,7 +81,7 @@ const AdminDashboard = () => {
 
   const handleUpdateProduct = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/products/${editingProduct._id}`, {
+      await axios.put(`https://pricewise-project.onrender.com/api/products/${editingProduct._id}`, {
         image: newImage || editingProduct.image,
         name: newName || editingProduct.name,
         category: editCategory || editingProduct.category,
@@ -98,7 +98,7 @@ const AdminDashboard = () => {
   const handleDeleteProduct = async (id) => {
     if (window.confirm('WARNING: Deleting this product will remove it from all price listings. Are you sure?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/products/${id}`, config);
+        await axios.delete(`https://pricewise-project.onrender.com/api/products/${id}`, config);
         alert('Product Deleted');
         fetchAll();
       } catch (error) {
@@ -109,7 +109,7 @@ const AdminDashboard = () => {
 
   const handleApproveShop = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/api/shops/${id}/approve`, {}, config);
+      await axios.put(`https://pricewise-project.onrender.com/api/shops/${id}/approve`, {}, config);
       alert("Shop Approved!");
       fetchAll();
     } catch (error) {
@@ -119,7 +119,7 @@ const AdminDashboard = () => {
 
   const handleUpdateShop = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/shops/${editingShop._id}`, {
+      await axios.put(`https://pricewise-project.onrender.com/api/shops/${editingShop._id}`, {
         shopName: editShopName,
         address: editShopAddress
       }, config);
@@ -134,7 +134,7 @@ const AdminDashboard = () => {
   const handleDeleteShop = async (id) => {
     if (window.confirm('WARNING: Deleting this shop will DELETE ALL PRICES associated with it. Are you sure?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/shops/${id}`, config);
+        await axios.delete(`https://pricewise-project.onrender.com/api/shops/${id}`, config);
         alert('Shop Deleted');
         fetchAll();
       } catch (error) {
@@ -152,7 +152,7 @@ const AdminDashboard = () => {
   const handleAddCategory = async () => {
     if (!newCategory) return;
     try {
-      await axios.post('http://localhost:5000/api/categories', { name: newCategory }, config);
+      await axios.post('https://pricewise-project.onrender.com/api/categories', { name: newCategory }, config);
       setNewCategory('');
       fetchAll();
     } catch (error) {
@@ -164,7 +164,7 @@ const AdminDashboard = () => {
     const subCatName = subCategoryInputs[categoryId];
     if (!subCatName) return;
     try {
-      await axios.put(`http://localhost:5000/api/categories/${categoryId}/subcategory`, { subCategory: subCatName }, config);
+      await axios.put(`https://pricewise-project.onrender.com/api/categories/${categoryId}/subcategory`, { subCategory: subCatName }, config);
       setSubCategoryInputs({ ...subCategoryInputs, [categoryId]: '' }); 
       fetchAll();
     } catch (error) {
@@ -175,7 +175,7 @@ const AdminDashboard = () => {
   const handleDeleteCategory = async (id) => {
     if (window.confirm('Delete this category?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/categories/${id}`, config);
+        await axios.delete(`https://pricewise-project.onrender.com/api/categories/${id}`, config);
         fetchAll();
       } catch (error) {
         alert('Error deleting category');
@@ -184,20 +184,20 @@ const AdminDashboard = () => {
   };
 
   const handleApprovePrice = async (id) => {
-    await axios.put(`http://localhost:5000/api/prices/${id}/approve`, {}, config);
+    await axios.put(`https://pricewise-project.onrender.com/api/prices/${id}/approve`, {}, config);
     fetchAll();
   };
   
   const handleDeletePrice = async (id) => {
     if(window.confirm("Delete this price listing?")) {
-      await axios.delete(`http://localhost:5000/api/prices/${id}`, config);
+      await axios.delete(`https://pricewise-project.onrender.com/api/prices/${id}`, config);
       fetchAll();
     }
   };
 
   const handleDismissReport = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/reports/${id}`, config);
+      await axios.delete(`https://pricewise-project.onrender.com/api/reports/${id}`, config);
       fetchAll();
     } catch (error) {
       alert("Error dismissing report");
@@ -206,7 +206,7 @@ const AdminDashboard = () => {
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return '';
-    return imagePath.startsWith('http') ? imagePath : `http://localhost:5000${imagePath}`;
+    return imagePath.startsWith('http') ? imagePath : `https://pricewise-project.onrender.com${imagePath}`;
   };
 
   return (

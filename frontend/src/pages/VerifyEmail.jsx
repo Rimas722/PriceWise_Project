@@ -15,7 +15,7 @@ const VerifyEmail = () => {
 
     const verifyUser = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/users/verify/${token}`);
+        const { data } = await axios.get(`https://pricewise-project.onrender.com/api/users/verify/${token}`);
         setMessage(data.message);
         setSuccess(true);
       } catch (error) {

@@ -18,7 +18,7 @@ const Login = () => {
       };
 
       const { data } = await axios.post(
-        'http://localhost:5000/api/users/login',
+        'https://pricewise-project.onrender.com/api/users/login',
         { email, password },
         config
       );

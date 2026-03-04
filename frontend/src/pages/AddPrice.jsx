@@ -21,8 +21,8 @@ const AddPrice = () => {
 
     const fetchData = async () => {
       try {
-        const { data: prodData } = await axios.get('http://localhost:5000/api/products');
-        const { data: shopData } = await axios.get('http://localhost:5000/api/shops');
+        const { data: prodData } = await axios.get('https://pricewise-project.onrender.com/api/products');
+        const { data: shopData } = await axios.get('https://pricewise-project.onrender.com/api/shops');
         
         setProducts(prodData);
 
@@ -67,7 +67,7 @@ const AddPrice = () => {
       };
 
       await axios.post(
-        'http://localhost:5000/api/prices',
+        'https://pricewise-project.onrender.com/api/prices',
         {
           shop: selectedShop,
           product: selectedProduct,

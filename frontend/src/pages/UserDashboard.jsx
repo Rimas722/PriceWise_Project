@@ -34,17 +34,17 @@ const UserDashboard = () => {
       try {
         const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
         
-        const favRes = await axios.get('http://localhost:5000/api/users/favorites', config);
+        const favRes = await axios.get('https://pricewise-project.onrender.com/api/users/favorites', config);
         setFavorites(favRes.data);
 
-        const priceRes = await axios.get('http://localhost:5000/api/prices');
+        const priceRes = await axios.get('https://pricewise-project.onrender.com/api/prices');
         const userHistory = priceRes.data.filter(p => 
           p.submittedBy === userInfo._id || p.submittedBy?._id === userInfo._id
         );
         setMySubmissions(userHistory.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
 
-        const prodRes = await axios.get('http://localhost:5000/api/products');
-        const shopRes = await axios.get('http://localhost:5000/api/shops');
+        const prodRes = await axios.get('https://pricewise-project.onrender.com/api/products');
+        const shopRes = await axios.get('https://pricewise-project.onrender.com/api/shops');
         setProducts(prodRes.data);
         setShops(shopRes.data);
 
@@ -63,7 +63,7 @@ const UserDashboard = () => {
       const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
       const newPriceData = { product: selectedProduct, shop: selectedShop, price: Number(price), proofImage };
       
-      const { data } = await axios.post('http://localhost:5000/api/prices', newPriceData, config);
+      const { data } = await axios.post('https://pricewise-project.onrender.com/api/prices', newPriceData, config);
       
       alert('✅ Price submitted successfully! Admin will verify soon.');
       
@@ -90,7 +90,7 @@ const UserDashboard = () => {
     const formData = new FormData();
     formData.append('image', file);
     try {
-      const { data } = await axios.post('http://localhost:5000/api/upload', formData, {
+      const { data } = await axios.post('https://pricewise-project.onrender.com/api/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       setProofImage(data);

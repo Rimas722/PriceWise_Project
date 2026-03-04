@@ -20,7 +20,7 @@ const ResetPassword = () => {
     }
 
     try {
-      const { data } = await axios.put(`http://localhost:5000/api/users/reset-password/${token}`, { password });
+      const { data } = await axios.put(`https://pricewise-project.onrender.com/api/users/reset-password/${token}`, { password });
       setMessage(data.message);
       setPassword('');
       setConfirmPassword('');

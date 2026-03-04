@@ -12,7 +12,7 @@ const ForgotPassword = () => {
     setMessage('');
     setError('');
     try {
-      const { data } = await axios.post('http://localhost:5000/api/users/forgot-password', { email });
+      const { data } = await axios.post('https://pricewise-project.onrender.com/api/users/forgot-password', { email });
       setMessage(data.message);
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong. Please try again.');

@@ -17,7 +17,7 @@ const RegisterShop = () => {
     try {
       const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
       
-      await axios.post('http://localhost:5000/api/shops', {
+      await axios.post('https://pricewise-project.onrender.com/api/shops', {
         shopName, address, phoneNumber
       }, config);
 
