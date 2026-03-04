@@ -13,6 +13,14 @@ const AddProduct = () => {
   const [categories, setCategories] = useState([]); 
   const navigate = useNavigate();
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -87,76 +95,80 @@ const AddProduct = () => {
   const availableSubCategories = selectedCatObj?.subCategories || [];
 
   return (
-    <div style={{ maxWidth: '500px', margin: '50px auto', padding: '20px', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: 'white' }}>
-      <h2 style={{ textAlign: 'center' }}>📦 Add New Product</h2>
+    <div style={{ backgroundColor: '#f4f6f7', minHeight: '100vh', boxSizing: 'border-box', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', padding: isMobile ? '20px 10px' : '50px 20px', fontFamily: 'Arial, sans-serif' }}>
       
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+      <div style={{ maxWidth: '500px', width: '100%', margin: isMobile ? '0' : '0 auto', padding: isMobile ? '20px' : '30px', border: '1px solid #ddd', borderRadius: '10px', backgroundColor: 'white', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', boxSizing: 'border-box' }}>
+        <h2 style={{ textAlign: 'center', color: '#2c3e50', marginBottom: '20px', fontSize: isMobile ? '1.5rem' : '2rem' }}>📦 Add New Product</h2>
         
-        <input 
-          type="text" 
-          placeholder="Product Name" 
-          value={name} 
-          onChange={(e) => setName(e.target.value)} 
-          style={{ padding: '10px' }} 
-          required 
-        />
+        <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+          
+          <input 
+            type="text" 
+            placeholder="Product Name" 
+            value={name} 
+            onChange={(e) => setName(e.target.value)} 
+            style={{ padding: '12px', borderRadius: '5px', border: '1px solid #ccc', fontSize: '1rem', width: '100%', boxSizing: 'border-box' }} 
+            required 
+          />
 
-        <select 
-          value={category} 
-          onChange={(e) => {
-            setCategory(e.target.value);
-            setSubCategory(''); 
-          }} 
-          style={{ padding: '10px' }} 
-          required
-        >
-          <option value="">-- Select Category --</option>
-          {categories.map(c => (
-            <option key={c._id} value={c.name}>{c.name}</option>
-          ))}
-        </select>
-=
-        {availableSubCategories.length > 0 && (
           <select 
-            value={subCategory} 
-            onChange={(e) => setSubCategory(e.target.value)} 
-            style={{ padding: '10px', backgroundColor: '#ebf5fb', border: '1px solid #3498db', color: '#2980b9' }}
+            value={category} 
+            onChange={(e) => {
+              setCategory(e.target.value);
+              setSubCategory(''); 
+            }} 
+            style={{ padding: '12px', borderRadius: '5px', border: '1px solid #ccc', fontSize: '1rem', width: '100%', boxSizing: 'border-box' }} 
+            required
           >
-            <option value="">-- General / No Sub-Category --</option>
-            {availableSubCategories.map(sub => (
-              <option key={sub} value={sub}>{sub}</option>
+            <option value="">-- Select Category --</option>
+            {categories.map(c => (
+              <option key={c._id} value={c.name}>{c.name}</option>
             ))}
           </select>
-        )}
+          
+          {availableSubCategories.length > 0 && (
+            <select 
+              value={subCategory} 
+              onChange={(e) => setSubCategory(e.target.value)} 
+              style={{ padding: '12px', backgroundColor: '#ebf5fb', border: '1px solid #3498db', color: '#2980b9', borderRadius: '5px', fontSize: '1rem', width: '100%', boxSizing: 'border-box' }}
+            >
+              <option value="">-- General / No Sub-Category --</option>
+              {availableSubCategories.map(sub => (
+                <option key={sub} value={sub}>{sub}</option>
+              ))}
+            </select>
+          )}
 
-        <select value={unit} onChange={(e) => setUnit(e.target.value)} style={{ padding: '10px' }}>
-          <option value="kg">Per Kg</option>
-          <option value="packet">Per Packet</option>
-          <option value="item">Per Item</option>
-          <option value="l">Per Liter</option>
-        </select>
+          <select value={unit} onChange={(e) => setUnit(e.target.value)} style={{ padding: '12px', borderRadius: '5px', border: '1px solid #ccc', fontSize: '1rem', width: '100%', boxSizing: 'border-box' }}>
+            <option value="kg">Per Kg</option>
+            <option value="packet">Per Packet</option>
+            <option value="item">Per Item</option>
+            <option value="l">Per Liter</option>
+          </select>
 
-        <div style={{ border: '1px dashed #ccc', padding: '10px', borderRadius: '5px' }}>
-            <label>Product Image:</label>
-            <input 
-              type="text" 
-              placeholder="Image URL" 
-              value={image} 
-              onChange={(e) => setImage(e.target.value)} 
-              disabled 
-              style={{ width: '100%', padding: '5px', marginBottom: '10px', backgroundColor: '#eee', boxSizing: 'border-box' }} 
-            />
-            <input 
-              type="file" 
-              onChange={uploadFileHandler} 
-            />
-            {uploading && <p style={{color:'blue'}}>Uploading to Cloud...</p>}
-        </div>
+          <div style={{ border: '1px dashed #ccc', padding: '15px', borderRadius: '5px', backgroundColor: '#f8f9fa', boxSizing: 'border-box' }}>
+              <label style={{ display: 'block', fontWeight: 'bold', marginBottom: '8px', color: '#34495e' }}>Product Image:</label>
+              <input 
+                type="text" 
+                placeholder="Image URL" 
+                value={image} 
+                onChange={(e) => setImage(e.target.value)} 
+                disabled 
+                style={{ width: '100%', padding: '10px', marginBottom: '10px', backgroundColor: '#eee', borderRadius: '5px', border: '1px solid #ccc', boxSizing: 'border-box' }} 
+              />
+              <input 
+                type="file" 
+                onChange={uploadFileHandler} 
+                style={{ width: '100%', boxSizing: 'border-box' }}
+              />
+              {uploading && <p style={{color:'#3498db', marginTop: '10px', fontWeight: 'bold'}}>⏳ Uploading to Cloud...</p>}
+          </div>
 
-        <button type="submit" style={{ padding: '10px', backgroundColor: 'purple', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 'bold', borderRadius: '5px' }}>
-          Add Product
-        </button>
-      </form>
+          <button type="submit" style={{ padding: isMobile ? '12px' : '15px', backgroundColor: '#8e44ad', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 'bold', borderRadius: '5px', fontSize: isMobile ? '1rem' : '1.1rem', marginTop: '10px', width: '100%', boxSizing: 'border-box' }}>
+            Add Product
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

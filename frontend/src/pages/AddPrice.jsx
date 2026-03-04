@@ -13,6 +13,14 @@ const AddPrice = () => {
   const [price, setPrice] = useState('');
   const [loading, setLoading] = useState(true);
 
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useEffect(() => {
     if (!userInfo) {
       navigate('/login');
@@ -49,7 +57,7 @@ const AddPrice = () => {
     };
     
     fetchData();
-  }, [navigate]); 
+  }, [navigate, userInfo]); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -90,73 +98,76 @@ const AddPrice = () => {
   }
 
   return (
-    <div style={styles.container}>
-      <h2 style={{ textAlign: 'center', marginBottom:'20px', color: '#2c3e50' }}>💰 Add New Price</h2>
-      <form onSubmit={handleSubmit} style={styles.form}>
+    <div style={{ ...styles.pageWrapper, padding: isMobile ? '20px 10px' : '50px 20px' }}>
+      <div style={{ ...styles.container, padding: isMobile ? '20px' : '30px', width: isMobile ? '100%' : '500px', margin: isMobile ? '0' : '0 auto' }}>
+        <h2 style={{ textAlign: 'center', marginBottom:'20px', color: '#2c3e50', fontSize: isMobile ? '1.5rem' : '2rem' }}>💰 Add New Price</h2>
+        <form onSubmit={handleSubmit} style={styles.form}>
 
-        <div style={styles.group}>
-          <label style={styles.label}>Shop:</label>
-          
-          {userInfo?.role === 'shop_owner' ? (
+          <div style={styles.group}>
+            <label style={styles.label}>Shop:</label>
+            
+            {userInfo?.role === 'shop_owner' ? (
+              <div style={styles.lockedBox}>
+                🏪 {shops.length > 0 ? shops[0].shopName : '⚠️ Shop not found or pending admin approval'}
+              </div>
+            ) : (
+              <select 
+                required 
+                value={selectedShop} 
+                onChange={(e) => setSelectedShop(e.target.value)} 
+                style={styles.input}
+              >
+                <option value="">-- Choose a Shop --</option>
+                {shops.map((s) => (
+                  <option key={s._id} value={s._id}>{s.shopName}</option>
+                ))}
+              </select>
+            )}
+          </div>
 
-            <div style={styles.lockedBox}>
-              🏪 {shops.length > 0 ? shops[0].shopName : '⚠️ Shop not found or pending admin approval'}
-            </div>
-          ) : (
-
-            <select 
-              required 
-              value={selectedShop} 
-              onChange={(e) => setSelectedShop(e.target.value)} 
-              style={styles.input}
-            >
-              <option value="">-- Choose a Shop --</option>
-              {shops.map((s) => (
-                <option key={s._id} value={s._id}>{s.shopName}</option>
+          <div style={styles.group}>
+            <label style={styles.label}>Select Product:</label>
+            <select value={selectedProduct} onChange={(e) => setSelectedProduct(e.target.value)} style={styles.input} required>
+              <option value="">-- Choose a Product --</option>
+              {products.map(product => (
+                <option key={product._id} value={product._id}>
+                  {product.name}
+                </option>
               ))}
             </select>
-          )}
-        </div>
+          </div>
 
-        <div style={styles.group}>
-          <label style={styles.label}>Select Product:</label>
-          <select value={selectedProduct} onChange={(e) => setSelectedProduct(e.target.value)} style={styles.input} required>
-            <option value="">-- Choose a Product --</option>
-            {products.map(product => (
-              <option key={product._id} value={product._id}>
-                {product.name}
-              </option>
-            ))}
-          </select>
-        </div>
+          <div style={styles.group}>
+            <label style={styles.label}>Price (Rs.):</label>
+            <input 
+              type="number" 
+              min="1" 
+              value={price} 
+              onChange={(e) => setPrice(e.target.value)} 
+              style={styles.input} 
+              placeholder="e.g. 250"
+              required 
+            />
+          </div>
 
-        <div style={styles.group}>
-          <label style={styles.label}>Price (Rs.):</label>
-          <input 
-            type="number" 
-            min="1" 
-            value={price} 
-            onChange={(e) => setPrice(e.target.value)} 
-            style={styles.input} 
-            placeholder="e.g. 250"
-            required 
-          />
-        </div>
-
-        <button type="submit" style={styles.button}>Submit Price</button>
-      </form>
+          <button type="submit" style={{ ...styles.button, padding: isMobile ? '12px' : '15px', fontSize: isMobile ? '1rem' : '1.1rem' }}>
+            Submit Price
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
 
 const styles = {
-  container: { maxWidth: '500px', margin: '50px auto', padding: '30px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', borderRadius: '10px', backgroundColor: 'white', fontFamily: 'Arial, sans-serif' },
+  pageWrapper: { backgroundColor: '#f4f6f7', minHeight: '100vh', boxSizing: 'border-box', display: 'flex', justifyContent: 'center', alignItems: 'flex-start' },
+  container: { maxWidth: '500px', boxShadow: '0 4px 15px rgba(0,0,0,0.1)', borderRadius: '10px', backgroundColor: 'white', fontFamily: 'Arial, sans-serif', boxSizing: 'border-box' },
   form: { display: 'flex', flexDirection: 'column', gap: '20px' },
   group: { display: 'flex', flexDirection: 'column', gap: '8px' },
   label: { fontWeight: 'bold', color: '#34495e' },
   input: { padding: '12px', borderRadius: '5px', border: '1px solid #ccc', fontSize: '1rem', width: '100%', boxSizing: 'border-box' },
-  lockedBox: { padding: '12px', backgroundColor: '#e9ecef', border: '1px solid #ccc', borderRadius: '5px', color: '#2c3e50', fontWeight: 'bold', fontSize: '1rem' },
-  button: { padding: '15px', backgroundColor: '#3498db', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontSize:'1.1rem', fontWeight: 'bold', marginTop: '10px', transition: '0.2s' }
+  lockedBox: { padding: '12px', backgroundColor: '#e9ecef', border: '1px solid #ccc', borderRadius: '5px', color: '#2c3e50', fontWeight: 'bold', fontSize: '1rem', boxSizing: 'border-box' },
+  button: { backgroundColor: '#3498db', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer', fontWeight: 'bold', marginTop: '10px', transition: '0.2s', width: '100%', boxSizing: 'border-box' }
 };
 
 export default AddPrice;

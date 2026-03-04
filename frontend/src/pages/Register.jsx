@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 
@@ -9,6 +9,14 @@ const Register = () => {
   const [role, setRole] = useState('consumer');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -44,8 +52,13 @@ const Register = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.formCard}>
+    <div style={{ ...styles.container, padding: isMobile ? '20px' : '40px 0' }}>
+      <div style={{ 
+        ...styles.formCard, 
+        width: isMobile ? '100%' : '400px', 
+        padding: isMobile ? '30px 20px' : '40px',
+        boxSizing: 'border-box' 
+      }}>
         <h2 style={{textAlign: 'center', marginBottom: '10px', color: '#2c3e50'}}>📝 Create Account</h2>
         <p style={{textAlign: 'center', color: '#7f8c8d', marginBottom: '20px'}}>Join PriceWise LK today</p>
         
@@ -126,11 +139,9 @@ const styles = {
     minHeight: '80vh',
     backgroundColor: '#f4f6f7',
     fontFamily: 'Arial, sans-serif',
-    padding: '40px 0'
+    boxSizing: 'border-box'
   },
   formCard: { 
-    width: '400px', 
-    padding: '40px', 
     boxShadow: '0 8px 20px rgba(0,0,0,0.1)', 
     borderRadius: '12px', 
     backgroundColor: 'white' 
