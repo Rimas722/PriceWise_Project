@@ -109,11 +109,11 @@ const Home = () => {
           <form style={{ display: 'flex', flexDirection: 'column', gap: '15px', textAlign: 'left' }} onSubmit={(e) => { e.preventDefault(); alert('Message sent! We will get back to you soon.'); }}>
             <div>
               <label style={labelStyle}>Your Name</label>
-              <input type="text" required style={inputStyle} placeholder="John Doe" />
+              <input type="text" required style={inputStyle} placeholder="" />
             </div>
             <div>
               <label style={labelStyle}>Email Address</label>
-              <input type="email" required style={inputStyle} placeholder="john@example.com" />
+              <input type="email" required style={inputStyle} placeholder="" />
             </div>
             <div>
               <label style={labelStyle}>Message</label>
