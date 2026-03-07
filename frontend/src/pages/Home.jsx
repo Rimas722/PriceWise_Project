@@ -24,7 +24,7 @@ const Home = () => {
   const sendEmail = (e) => {
     e.preventDefault();
 
-    emailjs.sendForm('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', form.current, 'YOUR_PUBLIC_KEY')
+    emailjs.sendForm('service_9dxrrba', 'template_ka0cvlr', form.current, 'SO1CmiQYlXPt0dUjT')
       .then((result) => {
           console.log(result.text);
           alert('✅ Message sent! We will get back to you soon.');
