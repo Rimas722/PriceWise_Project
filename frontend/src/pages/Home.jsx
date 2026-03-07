@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import emailjs from '@emailjs/browser'; 
 
 const Home = () => {
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  
+  const form = useRef(); 
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
@@ -17,6 +19,20 @@ const Home = () => {
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const sendEmail = (e) => {
+    e.preventDefault();
+
+    emailjs.sendForm('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', form.current, 'YOUR_PUBLIC_KEY')
+      .then((result) => {
+          console.log(result.text);
+          alert('✅ Message sent! We will get back to you soon.');
+          e.target.reset(); 
+      }, (error) => {
+          console.log(error.text);
+          alert('❌ Failed to send the message, please try again.');
+      });
   };
 
   return (
@@ -106,23 +122,24 @@ const Home = () => {
             Have questions, suggestions, or want to register a large supermarket chain? Send us a message!
           </p>
           
-          <form style={{ display: 'flex', flexDirection: 'column', gap: '15px', textAlign: 'left' }} onSubmit={(e) => { e.preventDefault(); alert('Message sent! We will get back to you soon.'); }}>
+          <form ref={form} onSubmit={sendEmail} style={{ display: 'flex', flexDirection: 'column', gap: '15px', textAlign: 'left' }}>
             <div>
               <label style={labelStyle}>Your Name</label>
-              <input type="text" required style={inputStyle} placeholder="" />
+              <input type="text" name="user_name" required style={inputStyle} placeholder="" />
             </div>
             <div>
               <label style={labelStyle}>Email Address</label>
-              <input type="email" required style={inputStyle} placeholder="" />
+              <input type="email" name="user_email" required style={inputStyle} placeholder="" />
             </div>
             <div>
               <label style={labelStyle}>Message</label>
-              <textarea required rows="5" style={inputStyle} placeholder="How can we help you?"></textarea>
+              <textarea name="message" required rows="5" style={inputStyle} placeholder="How can we help you?"></textarea>
             </div>
             <button type="submit" style={{ ...primaryBtn, width: '100%', marginTop: '10px', boxSizing: 'border-box' }}>
               Send Message
             </button>
           </form>
+
         </div>
       </section>
 
@@ -130,7 +147,7 @@ const Home = () => {
   );
 };
 
-const primaryBtn = { display: 'inline-block', padding: '15px 30px', backgroundColor: '#3498db', color: 'white', textDecoration: 'none', borderRadius: '30px', fontWeight: 'bold', fontSize: '1.1rem', transition: '0.3s', border: '2px solid #3498db' };
+const primaryBtn = { display: 'inline-block', padding: '15px 30px', backgroundColor: '#3498db', color: 'white', textDecoration: 'none', borderRadius: '30px', fontWeight: 'bold', fontSize: '1.1rem', transition: '0.3s', border: '2px solid #3498db', cursor: 'pointer' }; // Added cursor pointer
 const secondaryBtn = { display: 'inline-block', padding: '15px 30px', backgroundColor: 'transparent', color: 'white', textDecoration: 'none', borderRadius: '30px', fontWeight: 'bold', fontSize: '1.1rem', transition: '0.3s', border: '2px solid white' };
 const featureCard = { backgroundColor: 'white', padding: '40px 20px', borderRadius: '10px', boxShadow: '0 5px 15px rgba(0,0,0,0.05)', flex: '1', minWidth: '250px', textAlign: 'center', boxSizing: 'border-box' };
 const labelStyle = { display: 'block', fontWeight: 'bold', marginBottom: '5px', color: '#34495e', fontSize: '0.9rem' };
