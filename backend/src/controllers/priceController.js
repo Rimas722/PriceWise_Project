@@ -72,7 +72,6 @@ const deletePrice = async (req, res) => {
   }
 };
 
-
 const approvePrice = async (req, res) => {
   try {
     const pendingPrice = await Price.findById(req.params.id);
@@ -89,6 +88,8 @@ const approvePrice = async (req, res) => {
 
     if (existingPrice) {
       existingPrice.price = pendingPrice.price;
+
+      existingPrice.submittedBy = pendingPrice.submittedBy;
 
       if (pendingPrice.proofImage) {
         existingPrice.proofImage = pendingPrice.proofImage; 
@@ -201,6 +202,5 @@ const toggleStockStatus = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 module.exports = { getPrices, createPrice, getMyPrices, deletePrice, approvePrice, getAllPricesAdmin, getPriceAnalytics, upvotePrice, toggleStockStatus };

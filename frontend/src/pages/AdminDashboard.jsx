@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboard = () => {
+  const navigate = useNavigate(); 
+
   const [activeTab, setActiveTab] = useState('users'); 
 
   const [products, setProducts] = useState([]);
@@ -29,6 +32,12 @@ const AdminDashboard = () => {
 
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
   const config = { headers: { Authorization: `Bearer ${userInfo?.token}` } };
+
+  useEffect(() => {
+    if (!userInfo || userInfo.role !== 'admin') {
+      navigate('/login');
+    }
+  }, [navigate, userInfo]);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
